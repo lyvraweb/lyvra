@@ -34,7 +34,7 @@
           const user = result.user;
           // obter redirect da querystring
           const params = new URLSearchParams(window.location.search);
-          const redirect = params.get('redirect') || '/app';
+          const redirect = params.get('redirect') || '/app.html';
           // opcional: crie registro no backend via fetch aqui
           window.location.href = decodeURIComponent(redirect);
         } catch (err) {
