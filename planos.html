@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="assets/favicon.png">
-  <title>Lyvra - Escolha um Plano</title>
+  <title>Lyvra - Planos e Preços</title>
+
   <style>
     body {
       margin: 0;
@@ -12,6 +13,7 @@
       background: #f5f9ff;
       color: #0a1a2a;
     }
+
     header {
       display: flex;
       align-items: center;
@@ -22,58 +24,84 @@
     header img {
       height: 60px;
     }
+
     .container {
       max-width: 1100px;
       margin: 40px auto;
       padding: 20px;
       text-align: center;
     }
+
     h1 {
       font-size: 2.8rem;
       margin-bottom: 10px;
       color: #083b8c;
     }
+
     p.sub {
       font-size: 1.2rem;
       margin-bottom: 40px;
       color: #0a1a2acc;
     }
+
+    /* GRID DOS PLANOS */
     .plans {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 30px;
+      margin-bottom: 60px;
     }
+
     .plan {
       background: white;
       border-radius: 14px;
-      padding: 30px;
+      padding: 32px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       border: 2px solid #e2eaff;
       transition: 0.3s;
+      text-align: left;
     }
-    .plan:hover {
-      transform: translateY(-5px);
-      border-color: #3b82f6;
+
+    .plan.popular {
+      border-color: #0055ff;
+      box-shadow: 0 8px 30px rgba(0,85,255,0.15);
+      transform: scale(1.02);
     }
+
+    .badge-popular {
+      display: inline-block;
+      background: #0055ff;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
     .plan h2 {
       font-size: 1.6rem;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
+
     .price {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
       margin: 20px 0;
       color: #0055ff;
     }
+
     ul {
       list-style: none;
       padding: 0;
       margin: 0 0 25px 0;
+      font-size: 1rem;
+      line-height: 1.6;
     }
+
     ul li {
       margin: 10px 0;
-      font-size: 1rem;
     }
+
     a.button {
       display: block;
       background: linear-gradient(90deg, #4f3cff, #638bff);
@@ -82,75 +110,204 @@
       border-radius: 8px;
       text-decoration: none;
       font-size: 1.1rem;
+      text-align: center;
       transition: 0.2s;
     }
+
     a.button:hover {
-      opacity: 0.8;
+      opacity: 0.85;
+    }
+
+    /* TABELA COMPARATIVA */
+    .comparison {
+      margin-top: 70px;
+      padding: 20px;
+    }
+
+    .comparison h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #083b8c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 18px;
+      font-size: 1rem;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    th {
+      background: #f0f4ff;
+      color: #083b8c;
+      font-weight: bold;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    td.center {
+      text-align: center;
+    }
+
+    footer {
+      background:#ffffff;
+      border-top:1px solid #e6e6e6;
+      padding:40px 20px;
+      margin-top:60px;
+      text-align: center;
     }
   </style>
+
 </head>
 <body>
-  <header>
-    <img src="assets/logo.png" alt="Logo Lyvra" />
-  </header>
 
-  <div class="container">
-    <h1>Escolha seu plano</h1>
-    <p class="sub">Comece gratuitamente ou desbloqueie todo o poder da Lyvra AI</p>
+<header>
+  <img src="assets/logo.png" alt="Logo Lyvra" />
+</header>
 
-    <div class="plans">
+<div class="container">
 
-      <!-- FREE -->
-      <div class="plan">
-        <h2>Plano Free</h2>
-        <p class="price">$0/mês</p>
-        <ul>
-          <li>✓ 3 gerações por mês</li>
-          <li>✓ Posts básicos</li>
-          <li>✗ Sem anúncios</li>
-          <li>✗ Sem calendário mensal</li>
-        </ul>
-        <a href="/login.html?redirect=/app.html&plan=free" class="button">Começar</a>
-      </div>
+  <h1>Escolha o plano ideal para você</h1>
+  <p class="sub">Comece gratuitamente e desbloqueie recursos profissionais para acelerar seu crescimento</p>
 
-      <!-- PRO -->
-      <div class="plan" style="border-color:#0055ff; box-shadow:0 6px 25px rgba(0,85,255,0.25);">
-        <h2>Plano Pro</h2>
-        <p class="price">$ 5,99/mês</p>
-        <ul>
-          <li>✓ 300 gerações por mês</li>
-          <li>✓ Posts completos</li>
-          <li>✓ Geração de anúncios</li>
-          <li>✗ Sem calendário mensal</li>
-        </ul>
-        <a href="/login.html?redirect=/checkout.html?plan=pro" class="button">Assinar</a>
-      </div>
+  <div class="plans">
 
-      <!-- BUSINESS -->
-      <div class="plan">
-        <h2>Plano Business</h2>
-        <p class="price">$ 12,99/mês</p>
-        <ul>
-          <li>✓ Gerações ilimitadas</li>
-          <li>✓ Posts + Anúncios</li>
-          <li>✓ Calendário mensal completo</li>
-          <li>✓ Estratégias profissionais</li>
-        </ul>
-        <a href="/login.html?redirect=/checkout.html?plan=business" class="button">Assinar</a>
-      </div>
-
+    <!-- FREE -->
+    <div class="plan">
+      <h2>Free</h2>
+      <p class="price">$0/mês</p>
+      <ul>
+        <li>• 10 ideias de conteúdo por dia</li>
+        <li>• 1 post gerado por dia (imagem + copy)</li>
+        <li>• Preview com marca d’água</li>
+        <li>• Calendário IA básico</li>
+        <li>• Sem anúncios, sem vídeos</li>
+        <li>• 10 gerações/mês</li>
+      </ul>
+      <a href="/login.html?redirect=/app.html&plan=free" class="button">Começar grátis</a>
     </div>
+
+    <!-- PRO -->
+    <div class="plan popular">
+      <span class="badge-popular">Mais Popular</span>
+      <h2>Pro</h2>
+      <p class="price">$5,99/mês</p>
+      <ul>
+        <li>• 300 gerações por mês</li>
+        <li>• Posts completos (imagem HD + copy)</li>
+        <li>• Geração de anúncios e carrosséis</li>
+        <li>• Scripts para vídeos curtos</li>
+        <li>• Calendário IA completo</li>
+        <li>• Sem marca d’água</li>
+      </ul>
+      <a href="/login.html?redirect=/checkout.html?plan=pro" class="button">Assinar Pro</a>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="plan">
+      <h2>Business</h2>
+      <p class="price">$12,99/mês</p>
+      <ul>
+        <li>• Gerações ilimitadas</li>
+        <li>• Automação de conteúdo via IA</li>
+        <li>• Gerador de Pacotes (30 posts prontos)</li>
+        <li>• Relatórios estratégicos em PDF</li>
+        <li>• Modo agência (até 10 perfis)</li>
+        <li>• Prioridade máxima</li>
+      </ul>
+      <a href="/login.html?redirect=/checkout.html?plan=business" class="button">Assinar Business</a>
+    </div>
+
   </div>
 
-  <footer style="background:#ffffff; border-top:1px solid #e6e6e6; padding:40px 20px; margin-top:60px;">
-    <div style="max-width:1100px; margin:auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:30px;">
-      <div>
-        <img src="assets/logo.png" alt="Lyvra" style="height:45px; margin-bottom:15px;">
-        <p style="font-size:0.95rem; color:#4a5568; line-height:1.5;">Transcendendo os Limites da Criatividade Humana</p>
-      </div>
-    </div>
-    <p style="text-align:center; color:#6b7280; margin-top:30px; font-size:0.9rem;">© 2025 Lyvra. Todos os direitos reservados.</p>
-  </footer>
+  <!-- TABELA COMPARATIVA -->
+  <div class="comparison">
+    <h2>Compare os Planos</h2>
+
+    <table>
+      <tr>
+        <th>Recurso</th>
+        <th class="center">Free</th>
+        <th class="center">Pro</th>
+        <th class="center">Business</th>
+      </tr>
+
+      <tr>
+        <td>Ideias de Conteúdo</td>
+        <td class="center">10/dia</td>
+        <td class="center">ilimitado</td>
+        <td class="center">ilimitado</td>
+      </tr>
+
+      <tr>
+        <td>Posts Completos</td>
+        <td class="center">1/dia (SD)</td>
+        <td class="center">HD</td>
+        <td class="center">HD ilimitado</td>
+      </tr>
+
+      <tr>
+        <td>Carrosséis</td>
+        <td class="center">–</td>
+        <td class="center">✓</td>
+        <td class="center">✓ ilimitado</td>
+      </tr>
+
+      <tr>
+        <td>Anúncios</td>
+        <td class="center">–</td>
+        <td class="center">✓</td>
+        <td class="center">✓</td>
+      </tr>
+
+      <tr>
+        <td>Calendário IA</td>
+        <td class="center">básico</td>
+        <td class="center">completo</td>
+        <td class="center">automação total</td>
+      </tr>
+
+      <tr>
+        <td>Limite Mensal</td>
+        <td class="center">10</td>
+        <td class="center">300</td>
+        <td class="center">ilimitado</td>
+      </tr>
+
+      <tr>
+        <td>Perfis por Conta</td>
+        <td class="center">1</td>
+        <td class="center">1</td>
+        <td class="center">até 10</td>
+      </tr>
+
+      <tr>
+        <td>Prioridade</td>
+        <td class="center">baixa</td>
+        <td class="center">média</td>
+        <td class="center">alta</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+
+<footer>
+  <img src="assets/logo.png" alt="Lyvra" style="height:45px; margin-bottom:15px;">
+  <p style="font-size:0.95rem; color:#4a5568; line-height:1.5;">Transcendendo os Limites da Criatividade Humana</p>
+  <p style="text-align:center; color:#6b7280; margin-top:30px; font-size:0.9rem;">© 2025 Lyvra. Todos os direitos reservados.</p>
+</footer>
 
 </body>
 </html>
