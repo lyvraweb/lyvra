@@ -1,33 +1,61 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const admin = require('firebase-admin');
+import Stripe from "stripe";
+import admin from "firebase-admin";
 
-// Initialize Firebase admin with credentials (set via env or service account)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 if (!admin.apps.length) {
-  try {
-    admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
-  } catch (e) {
-    console.log('Firebase admin init error (in dev), continuing: ', e.message);
-  }
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
 }
 
-module.exports = async (req, res) => {
-  const sig = req.headers['stripe-signature'];
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res) {
+  const sig = req.headers["stripe-signature"];
+
   let event;
+
   try {
-    event = stripe.webhooks.constructEvent(req.rawBody || req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    const rawBody = await buffer(req);
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (err) {
-    console.log('Webhook signature verification failed.', err.message);
+    console.error("Webhook signature error:", err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  if (event.type === 'checkout.session.completed') {
+
+  // Evento específico
+  if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    const uid = session.metadata && session.metadata.uid;
-    if(uid) {
-      // update Firestore user plan
-      const db = admin.firestore();
-      const userRef = db.collection('users').doc(uid);
-      await userRef.set({ plan: session.metadata.plan || 'pro', subscription: session.subscription }, { merge: true });
-    }
+    const uid = session.metadata.uid;
+    const plan = session.display_items ? session.display_items[0].plan.id : session.mode;
+
+    await admin.firestore().collection("users").doc(uid).set(
+      {
+        plan,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
   }
+
   res.json({ received: true });
-};
+}
+
+// Buffer util
+function buffer(req) {
+  return new Promise((resolve) => {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+  });
+}
