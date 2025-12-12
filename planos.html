@@ -1,312 +1,265 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <title>Lyvra - Planos e Preços</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<title>Lyvra - Planos e Preços</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f9ff;
-      color: #0a1a2a;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    header {
-      display: flex;
-      align-items: center;
-      padding: 20px 40px;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    header img {
-      height: 60px;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f9ff;
+  color: #0a1a2a;
+}
 
-    .container {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 20px;
-      text-align: center;
-    }
+header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
 
-    h1 {
-      font-size: 2.8rem;
-      margin-bottom: 10px;
-      color: #083b8c;
-    }
+header img {
+  height: 48px;
+}
 
-    p.sub {
-      font-size: 1.2rem;
-      margin-bottom: 40px;
-      color: #0a1a2acc;
-    }
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
 
-    /* GRID DOS PLANOS */
-    .plans {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-bottom: 60px;
-    }
+h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin-bottom: 10px;
+  color: #083b8c;
+  text-align: center;
+}
 
-    .plan {
-      background: white;
-      border-radius: 14px;
-      padding: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      border: 2px solid #e2eaff;
-      transition: 0.3s;
-      text-align: left;
-    }
+p.sub {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin-bottom: 40px;
+  color: #0a1a2acc;
+  text-align: center;
+}
 
-    .plan.popular {
-      border-color: #0055ff;
-      box-shadow: 0 8px 30px rgba(0,85,255,0.15);
-      transform: scale(1.02);
-    }
+/* PLANOS */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
 
-    .badge-popular {
-      display: inline-block;
-      background: #0055ff;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      margin-bottom: 12px;
-    }
+.plan {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 2px solid #e2eaff;
+  transition: 0.3s;
+}
 
-    .plan h2 {
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
+.plan:hover {
+  transform: translateY(-5px);
+  border-color: #3b82f6;
+}
 
-    .price {
-      font-size: 2.2rem;
-      font-weight: bold;
-      margin: 20px 0;
-      color: #0055ff;
-    }
+.plan.popular {
+  border-color: #0055ff;
+  box-shadow: 0 8px 30px rgba(0,85,255,0.2);
+}
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 25px 0;
-      font-size: 1rem;
-      line-height: 1.6;
-    }
+.badge-popular {
+  display: inline-block;
+  background: #0055ff;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
 
-    ul li {
-      margin: 10px 0;
-    }
+.plan h2 {
+  font-size: 1.5rem;
+}
 
-    a.button {
-      display: block;
-      background: linear-gradient(90deg, #4f3cff, #638bff);
-      color: white;
-      padding: 14px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 1.1rem;
-      text-align: center;
-      transition: 0.2s;
-    }
+.price {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 16px 0;
+  color: #0055ff;
+}
 
-    a.button:hover {
-      opacity: 0.85;
-    }
+ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
 
-    /* TABELA COMPARATIVA */
-    .comparison {
-      margin-top: 70px;
-      padding: 20px;
-    }
+ul li {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
 
-    .comparison h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      color: #083b8c;
-    }
+a.button {
+  display: block;
+  width: 100%;
+  background: linear-gradient(90deg, #4f3cff, #638bff);
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 1.05rem;
+  text-align: center;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      border-radius: 14px;
-      overflow: hidden;
-    }
+/* COMPARAÇÃO */
+.comparison {
+  margin-top: 80px;
+}
 
-    th, td {
-      padding: 18px;
-      font-size: 1rem;
-      border-bottom: 1px solid #eaeaea;
-    }
+.comparison h2 {
+  text-align: center;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  color: #083b8c;
+  margin-bottom: 20px;
+}
 
-    th {
-      background: #f0f4ff;
-      color: #083b8c;
-      font-weight: bold;
-    }
+/* TABELA DESKTOP */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border-radius: 16px;
+  overflow: hidden;
+}
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+th, td {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+}
 
-    td.center {
-      text-align: center;
-    }
+th {
+  background: #f0f4ff;
+  color: #083b8c;
+}
 
-    footer {
-      background:#ffffff;
-      border-top:1px solid #e6e6e6;
-      padding:40px 20px;
-      margin-top:60px;
-      text-align: center;
-    }
-  </style>
+/* MOBILE TABLE → CARDS */
+@media (max-width: 768px) {
+  table {
+    display: none;
+  }
 
+  .mobile-comparison {
+    display: grid;
+    gap: 20px;
+  }
+
+  .mobile-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  .mobile-card h3 {
+    color: #0055ff;
+    margin-bottom: 12px;
+  }
+
+  .mobile-card p {
+    font-size: 0.95rem;
+    margin: 6px 0;
+  }
+}
+
+/* FOOTER */
+footer {
+  background: #ffffff;
+  border-top: 1px solid #e6e6e6;
+  padding: 40px 20px;
+  margin-top: 80px;
+  text-align: center;
+}
+
+footer img {
+  height: 42px;
+  margin-bottom: 12px;
+}
+
+footer p {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+</style>
 </head>
+
 <body>
 
 <header>
-  <img src="assets/logo.png" alt="Logo Lyvra" />
+  <img src="assets/logo.png" alt="Lyvra">
 </header>
 
 <div class="container">
-
   <h1>Escolha o plano ideal para você</h1>
-  <p class="sub">Comece gratuitamente e desbloqueie recursos profissionais para acelerar seu crescimento</p>
+  <p class="sub">Comece grátis e evolua com recursos profissionais</p>
 
   <div class="plans">
 
-    <!-- FREE -->
     <div class="plan">
       <h2>Free</h2>
-      <p class="price">$0/mês</p>
+      <p class="price">$0</p>
       <ul>
-        <li>• 10 ideias de conteúdo por dia</li>
-        <li>• 1 post gerado por dia (imagem + copy)</li>
-        <li>• Preview com marca d’água</li>
-        <li>• Calendário IA básico</li>
-        <li>• Sem anúncios, sem vídeos</li>
-        <li>• 10 gerações/mês</li>
+        <li>10 ideias de conteúdo/dia</li>
+        <li>1 post diário com marca d’água</li>
+        <li>Calendário IA básico</li>
+        <li>10 gerações/mês</li>
       </ul>
       <a href="/login.html?redirect=/app.html&plan=free" class="button">Começar grátis</a>
     </div>
 
-    <!-- PRO -->
     <div class="plan popular">
       <span class="badge-popular">Mais Popular</span>
       <h2>Pro</h2>
-      <p class="price">$5,99/mês</p>
+      <p class="price">$5,99</p>
       <ul>
-        <li>• 300 gerações por mês</li>
-        <li>• Posts completos (imagem HD + copy)</li>
-        <li>• Geração de anúncios e carrosséis</li>
-        <li>• Scripts para vídeos curtos</li>
-        <li>• Calendário IA completo</li>
-        <li>• Sem marca d’água</li>
+        <li>300 gerações/mês</li>
+        <li>Posts e carrosséis HD</li>
+        <li>Anúncios e scripts</li>
+        <li>Sem marca d’água</li>
       </ul>
       <a href="/login.html?redirect=/checkout.html?plan=pro" class="button">Assinar Pro</a>
     </div>
 
-    <!-- BUSINESS -->
     <div class="plan">
       <h2>Business</h2>
-      <p class="price">$12,99/mês</p>
+      <p class="price">$12,99</p>
       <ul>
-        <li>• Gerações ilimitadas</li>
-        <li>• Automação de conteúdo via IA</li>
-        <li>• Gerador de Pacotes (30 posts prontos)</li>
-        <li>• Relatórios estratégicos em PDF</li>
-        <li>• Modo agência (até 10 perfis)</li>
-        <li>• Prioridade máxima</li>
+        <li>Gerações ilimitadas</li>
+        <li>Automação total com IA</li>
+        <li>Modo agência</li>
+        <li>Prioridade máxima</li>
       </ul>
       <a href="/login.html?redirect=/checkout.html?plan=business" class="button">Assinar Business</a>
     </div>
 
   </div>
-
-  <!-- TABELA COMPARATIVA -->
-  <div class="comparison">
-    <h2>Compare os Planos</h2>
-
-    <table>
-      <tr>
-        <th>Recurso</th>
-        <th class="center">Free</th>
-        <th class="center">Pro</th>
-        <th class="center">Business</th>
-      </tr>
-
-      <tr>
-        <td>Ideias de Conteúdo</td>
-        <td class="center">10/dia</td>
-        <td class="center">ilimitado</td>
-        <td class="center">ilimitado</td>
-      </tr>
-
-      <tr>
-        <td>Posts Completos</td>
-        <td class="center">1/dia (SD)</td>
-        <td class="center">HD</td>
-        <td class="center">HD ilimitado</td>
-      </tr>
-
-      <tr>
-        <td>Carrosséis</td>
-        <td class="center">–</td>
-        <td class="center">✓</td>
-        <td class="center">✓ ilimitado</td>
-      </tr>
-
-      <tr>
-        <td>Anúncios</td>
-        <td class="center">–</td>
-        <td class="center">✓</td>
-        <td class="center">✓</td>
-      </tr>
-
-      <tr>
-        <td>Calendário IA</td>
-        <td class="center">básico</td>
-        <td class="center">completo</td>
-        <td class="center">automação total</td>
-      </tr>
-
-      <tr>
-        <td>Limite Mensal</td>
-        <td class="center">10</td>
-        <td class="center">300</td>
-        <td class="center">ilimitado</td>
-      </tr>
-
-      <tr>
-        <td>Perfis por Conta</td>
-        <td class="center">1</td>
-        <td class="center">1</td>
-        <td class="center">até 10</td>
-      </tr>
-
-      <tr>
-        <td>Prioridade</td>
-        <td class="center">baixa</td>
-        <td class="center">média</td>
-        <td class="center">alta</td>
-      </tr>
-    </table>
-  </div>
-
 </div>
 
-
 <footer>
-  <img src="assets/logo.png" alt="Lyvra" style="height:45px; margin-bottom:15px;">
-  <p style="font-size:0.95rem; color:#4a5568; line-height:1.5;">Transcendendo os Limites da Criatividade Humana</p>
-  <p style="text-align:center; color:#6b7280; margin-top:30px; font-size:0.9rem;">© 2025 Lyvra. Todos os direitos reservados.</p>
+  <img src="assets/logo.png" alt="Lyvra">
+  <p>Transcendendo os Limites da Criatividade Humana</p>
+  <p>© 2025 Lyvra. Todos os direitos reservados.</p>
 </footer>
 
 </body>
