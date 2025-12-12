@@ -7,6 +7,15 @@
     <p id="plan-info">Carregando plano...</p>
     <button id="pay">Pagar com Stripe</button>
     <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0",
+    storageBucket: "lyvra-e48a0.firebasestorage.app",
+    messagingSenderId: "1022305501638",
+    appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
+    measurementId: "G-EYHVTSZYPX"
+  };
       async function fetchCreateSession(plan){
         const body = { plan, email: 'test@example.com', uid: 'anon' };
         const res = await fetch('/api/create-checkout-session', {
