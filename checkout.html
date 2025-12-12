@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Checkout — Lyvra</title></head>
+<body>
+  <main class="container">
+    <h1>Finalizar Assinatura</h1>
+    <p id="plan-info">Carregando plano...</p>
+    <button id="pay">Pagar com Stripe</button>
+    <script>
+      async function fetchCreateSession(plan){
+        const body = { plan, email: 'test@example.com', uid: 'anon' };
+        const res = await fetch('/api/create-checkout-session', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if(data.url) window.location.href = data.url;
+        else alert('Erro ao criar sessão: ' + (data.error || 'unknown'));
+      }
+      const params = new URLSearchParams(window.location.search);
+      const plan = params.get('plan') || 'pro';
+      document.getElementById('plan-info').innerText = 'Plano: ' + plan;
+      document.getElementById('pay').addEventListener('click', () => fetchCreateSession(plan));
+    </script>
+  </main>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Login — Lyvra</title>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+  <main class="container">
+    <h1>Entrar no Lyvra</h1>
+    <p>Use sua conta Google para entrar rapidamente.</p>
+    <button id="btn-google">Entrar com Google</button>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+      // CONFIGURE ESTA VARIÁVEL com suas credenciais do Firebase (substitua em deploy)
+      const firebaseConfig = {
+        apiKey: "FIREBASE_API_KEY",
+        authDomain: "FIREBASE_AUTH_DOMAIN",
+        projectId: "FIREBASE_PROJECT_ID"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      document.getElementById('btn-google').addEventListener('click', async () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          const result = await auth.signInWithPopup(provider);
+          const user = result.user;
+          // obter redirect da querystring
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect') || '/app';
+          // opcional: crie registro no backend via fetch aqui
+          window.location.href = decodeURIComponent(redirect);
+        } catch (err) {
+          alert('Erro no login: ' + err.message);
+        }
+      });
+    </script>
+  </main>
+</body>
+</html>

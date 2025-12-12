@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lyvra — Marketing Automático com IA</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      /* Prevenir scroll horizontal */
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      width: 100%;
+      background: #fff;
+      border-bottom: 1px solid #d2d2d7;
+      position: fixed;
+      top: 0;
+      z-index: 1000
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      padding: 0 5%
+    }
+
+    .logo {
+      font-weight: 700;
+      color: #000;
+      font-size: 20px;
+      text-decoration: none
+    }
+
+    .logo-img {
+      height: 28px;
+      width: auto;
+      display: block;
+      max-width: 100%;
+    }
+
+    /* NOVO CARROSSEL HORIZONTAL */
+    .carousel-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      margin-top: 60px;
+      /* espaço para o header fixo */
+      overflow: hidden;
+      /* Prevenir problemas de scroll em mobile */
+      touch-action: pan-y;
+    }
+
+    .carousel-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s ease-in-out;
+      /* Melhorar performance em mobile */
+      will-change: transform;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      position: relative;
+      height: 100%;
+      /* Prevenir seleção de texto durante o arraste */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .slide-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(110%);
+      /* Melhorar performance */
+      transform: translateZ(0);
+    }
+
+    .slide-content {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #fff;
+      padding: 0 20px;
+      max-width: 880px;
+      width: 100%;
+      z-index: 2;
+      opacity: 1;
+    }
+
+    .slide-content h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, .35);
+      margin-bottom: 20px;
+      line-height: 1.02;
+    }
+
+    .slide-content p {
+      font-size: 1.15rem;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, .35);
+      font-weight: 400;
+      opacity: .95;
+    }
+
+    /* INDICADORES VERTICAIS LATERAIS */
+    .carousel-indicators {
+      position: absolute;
+      right: 25px;
+      /* posição lateral */
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .carousel-indicators div {
+      width: 3px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.3s, height 0.3s;
+    }
+
+    .carousel-indicators div.active {
+      background: #fff;
+      height: 34px;
+    }
+
+
+    /* CONTEÚDO PRINCIPAL */
+    .main-content {
+      position: relative;
+      z-index: 1;
+      background: #fff;
+    }
+
+    .connect-section {
+      width: 100%;
+      background: #fff;
+      padding: 100px 5%
+    }
+
+    .connect-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center
+    }
+
+    .event-label {
+      color: #0b66e4;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      font-size: .85rem
+    }
+
+    .connect-title {
+      font-size: 3.2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #0f2330
+    }
+
+    .connect-description {
+      color: #424245;
+      font-size: 1.05rem;
+      margin-bottom: 28px;
+      max-width: 620px
+    }
+
+    .connect-button {
+      background: #0b66e4;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block
+    }
+
+    .connect-image {
+      height: 500px;
+      border-radius: 12px;
+      background: #f5f5f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8e8e93;
+      border: none;
+      overflow: hidden;
+    }
+
+    .connect-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(15,24,30,0.08);
+    }
+
+    .products-section {
+      width: 100%;
+      background: #fff;
+      padding: 80px 5%
+    }
+
+    .products-container {
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .products-header {
+      text-align: center;
+      margin-bottom: 48px
+    }
+
+    .products-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .products-subtitle {
+      color: #424245;
+      font-size: 1.05rem
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px
+    }
+
+    .product-card {
+      background: #f8fafb;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid #eef2f6
+    }
+
+    .product-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      color: #0b66e4
+    }
+
+    .product-name {
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .product-description {
+      color: #444
+    }
+
+    .actions-section {
+      width: 100%;
+      background: #fff;
+      padding: 80px 5%
+    }
+
+    .actions-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 520px;
+      gap: 40px;
+      align-items: start
+    }
+
+    .actions-left {
+      padding-right: 10%
+    }
+
+    .actions-heading {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.02;
+      margin-bottom: 18px;
+      color: #0f2330
+    }
+
+    .actions-desc {
+      color: #424245;
+      font-size: 1.02rem;
+      margin-bottom: 20px;
+      max-width: 560px
+    }
+
+    .actions-cta {
+      display: inline-block;
+      background: #0b66e4;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    .actions-right {
+      display: flex;
+      flex-direction: column;
+      gap: 18px
+    }
+
+    .action-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(12, 20, 30, 0.04)
+    }
+
+    .action-card img {
+      width: 86px;
+      height: 86px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #eef2f6;
+      flex-shrink: 0
+    }
+
+    .action-card .card-text h4 {
+      font-size: 1.02rem;
+      margin-bottom: 6px;
+      color: #0f2330;
+      font-weight: 700
+    }
+
+    .action-card .card-text p {
+      color: #4a5358;
+      font-size: 0.98rem;
+      line-height: 1.45;
+      margin: 0
+    }
+
+    .leadership-section {
+      width: 100%;
+      background: #fff;
+      padding: 80px 5%
+    }
+
+    .leadership-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center
+    }
+
+    .leadership-text h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 12px
+    }
+
+    .leadership-text p {
+      color: #424245;
+      margin-bottom: 18px;
+      max-width: 620px
+    }
+
+    .lead-btn {
+      display: inline-block;
+      background: #0b66e4;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    .leadership-image {
+      height: 340px;
+      border-radius: 16px;
+      background: #f5f5f7;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden
+    }
+
+    .leadership-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    /* RODAPÉ MINIMALISTA */
+    .footer-minimal {
+      background: #fff;
+      padding: 50px 5% 30px;
+      border-top: 1px solid #e6e6ea;
+      font-family: "Inter", sans-serif;
+      color: #555;
+    }
+
+    .footer-minimal .footer-top {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 24px;
+    }
+
+    .footer-minimal .footer-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .footer-minimal .footer-brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer-minimal .footer-brand h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #111;
+    }
+
+    .footer-minimal .footer-brand p {
+      font-size: 0.9rem;
+      color: #777;
+      margin: 2px 0 0 0;
+    }
+
+    .footer-minimal .footer-bottom {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .footer-minimal .footer-bottom a {
+      color: #111;
+      text-decoration: none;
+    }
+
+    .footer-minimal .footer-bottom a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .footer-minimal .footer-top {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ÍCONES SOCIAIS NO RODAPÉ */
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 20px;
+    }
+
+    .footer-social {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-social a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #f1f1f1;
+      transition: background 0.25s ease;
+    }
+
+    .footer-social a:hover {
+      background: #e1e1e1;
+    }
+
+    .footer-social img {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+
+    /* BANNER ESPECIAL (tipo Meta Quest) */
+    .feature-banner {
+      max-width: 1250px;
+      margin: 60px auto;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      height: 380px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+    }
+
+    .feature-content {
+      position: relative;
+      text-align: center;
+      color: #fff;
+      z-index: 2;
+      max-width: 800px;
+      padding: 0 20px;
+    }
+
+    .feature-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+
+    .feature-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-subtitle {
+      font-size: 1.05rem;
+      opacity: 0.95;
+      margin-bottom: 20px;
+    }
+
+    .feature-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .feature-buttons a {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.25s ease;
+    }
+
+    .feature-buttons .btn-primary {
+      background: #0b66e4;
+      color: #fff;
+    }
+
+    .feature-buttons .btn-primary:hover {
+      background: #004cbf;
+    }
+
+    .feature-buttons .btn-secondary {
+      background: #fff;
+      color: #0f2330;
+    }
+
+    .feature-buttons .btn-secondary:hover {
+      background: #e9e9e9;
+    }
+
+    /* MEDIA QUERIES PARA RESPONSIVIDADE */
+    @media (max-width: 1200px) {
+      .connect-title {
+        font-size: 2.8rem;
+      }
+      
+      .actions-heading {
+        font-size: 36px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .connect-container,
+      .leadership-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .connect-image {
+        height: 400px;
+        order: -1;
+      }
+
+      .actions-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .actions-left {
+        padding-right: 0;
+      }
+
+      .actions-right {
+        order: 2;
+      }
+
+      .actions-left {
+        order: 1;
+      }
+
+      .leadership-image {
+        height: 280px;
+        order: -1;
+      }
+
+      .slide-content h2 {
+        font-size: 2.2rem;
+      }
+      
+      .carousel-indicators {
+        right: 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .connect-title {
+        font-size: 2.4rem;
+      }
+      
+      .actions-heading {
+        font-size: 32px;
+      }
+      
+      .feature-title {
+        font-size: 1.8rem;
+      }
+      
+      .feature-banner {
+        height: 320px;
+        margin: 40px auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .carousel-indicators {
+        right: 10px;
+      }
+      
+      .carousel-indicators div {
+        width: 2px;
+        height: 20px;
+      }
+      
+      .carousel-indicators div.active {
+        height: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .slide-content h2 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+      }
+
+      .slide-content p {
+        font-size: 1rem;
+      }
+
+      .connect-title {
+        font-size: 2rem;
+      }
+      
+      .connect-description {
+        font-size: 1rem;
+      }
+      
+      .products-title {
+        font-size: 1.8rem;
+      }
+      
+      .actions-heading {
+        font-size: 24px;
+      }
+
+      .action-card {
+        padding: 12px;
+        gap: 10px;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .action-card img {
+        width: 64px;
+        height: 64px;
+      }
+      
+      .feature-title {
+        font-size: 1.5rem;
+      }
+      
+      .feature-subtitle {
+        font-size: 1rem;
+      }
+      
+      .feature-banner {
+        height: 280px;
+        margin: 30px auto;
+        border-radius: 12px;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .slide-content h2 {
+        font-size: 1.6rem;
+      }
+      
+      .connect-title {
+        font-size: 1.8rem;
+      }
+      
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Melhorias de acessibilidade e interação */
+    .connect-button,
+    .actions-cta,
+    .lead-btn,
+    .feature-buttons a {
+      transition: all 0.3s ease;
+    }
+
+    .connect-button:hover,
+    .actions-cta:hover,
+    .lead-btn:hover {
+      background: #004cbf;
+      transform: translateY(-2px);
+    }
+
+    /* Prevenir problemas de zoom em iOS */
+    input, select, textarea {
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav-container">
+      <a href="#">
+        <img src="assets/logo.png" alt="Lyvra logo" class="logo-img">
+      </a>
+      <div style="display:flex;gap:14px;align-items:center">
+        <a href="planos.html" class="connect-button" style="margin-left:12px" target="_blank">Escolher um plano</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CARROSSEL HORIZONTAL -->
+  <div class="carousel-wrapper">
+    <div class="carousel-track">
+      <div class="carousel-slide">
+        <div class="slide-bg" style="background-image: url('assets/12.avif');"></div>
+        <div class="slide-content">
+          <h2>O futuro do marketing, em 1 clique.</h2>
+          <p>Crie anúncios, posts e páginas que convertem com IA otimizada para vendas.</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <div class="slide-bg" style="background-image: url('assets/11.avif');"></div>
+        <div class="slide-content">
+          <h2>Produza conteúdo que vende — 10x mais rápido.</h2>
+          <p>Do roteiro ao criativo final: campanhas prontas para publicar.</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <div class="slide-bg" style="background-image: url('assets/3.jpeg');"></div>
+        <div class="slide-content">
+          <h2>Mais alcance. Menos trabalho.</h2>
+          <p>Automatize publicações e foque no que importa: vender.</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <div class="slide-bg" style="background-image: url('assets/hero.webp');"></div>
+        <div class="slide-content">
+          <h2>Sua equipe de marketing 100% digital.</h2>
+          <p>Conteúdo, anúncios e relatórios gerados por IA — sem complicação.</p>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-indicators"></div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="main-content">
+    <section class="connect-section" id="get">
+      <div class="connect-container">
+        <div class="connect-content">
+          <div class="event-label">PLATAFORMA DE IA</div>
+          <h1 class="connect-title">Lyvra - Marketing automático de ponta a ponta</h1>
+          <p class="connect-description">
+            Com 1 clique, gere textos persuasivos, criativos e páginas de venda otimizadas por dados. Teste grátis — escale rápido.
+          </p>
+          <a class="connect-button" href="planos.html" target="_blank">Comece grátis - experimente 3 gerações agora</a>
+        </div>
+        <div class="connect-image">
+          <img src="assets/7.jpg" alt="Lyvra hero">
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section" id="features">
+      <div class="products-container">
+        <div class="products-header">
+          <h2 class="products-title">Tudo o que você precisa em um só lugar</h2>
+          <p class="products-subtitle">Recursos que aceleram resultados</p>
+        </div>
+        <div class="products-grid">
+          <div class="product-card">
+            <div class="product-icon">✍️</div>
+            <h3 class="product-name">Copywriting com IA</h3>
+            <p class="product-description">Anúncios, landing pages e sequências de e-mails otimizadas para conversão —
+              prontas em segundos.</p>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">🎨</div>
+            <h3 class="product-name">Criação Visual Automática</h3>
+            <p class="product-description">Imagens únicas geradas por IA, otimizadas para anúncios e posts em todas as
+              redes.</p>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">📅</div>
+            <h3 class="product-name">Agendamento e Publicação</h3>
+            <p class="product-description">Programe campanhas inteiras para múltiplas redes sociais com 1 clique.</p>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">📊</div>
+            <h3 class="product-name">Analytics Inteligente</h3>
+            <p class="product-description">Relatórios simples que mostram o que funciona para você escalar com
+              segurança.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-section" aria-labelledby="acoes-title">
+      <div class="actions-container">
+        <div class="actions-left">
+          <h2 id="acoes-title" class="actions-heading">Marketing inteligente. Resultados reais.</h2>
+          <p class="actions-desc">A Lyvra foi feita para ser indispensável: segurança, simplicidade e performance em
+            escala. Reduza custos, aumente conversões e recupere horas preciosas da sua semana.</p>
+          <a class="actions-cta" href="planos.html" target="_blank">Quero acessar o Lyvra agora</a>
+        </div>
+        <div class="actions-right">
+          <div class="action-card">
+            <img src="assets/dashboard.png" alt="Segurança e expressão">
+            <div class="card-text">
+              <h4>Segurança e Controle</h4>
+              <p>Seus dados e campanhas protegidos — conforme as melhores práticas de privacidade.</p>
+            </div>
+          </div>
+          <div class="action-card">
+            <img src="assets/cta.webp" alt="Dados e privacidade">
+            <div class="card-text">
+              <h4>IA Responsável</h4>
+              <p>Modelos afinados para performance e para evitar vieses que prejudiquem sua marca.</p>
+            </div>
+          </div>
+          <div class="action-card">
+            <img src="assets/4.jpg" alt="Inovação responsável">
+            <div class="card-text">
+              <h4>Performance Comprovada</h4>
+              <p>Campanhas que convertem — mensuráveis e fáceis de otimizar.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- BANNER ESPECIAL -->
+    <section class="feature-banner" style="background-image: url('assets/3.jpeg');">
+      <div class="feature-overlay"></div>
+      <div class="feature-content">
+        <div class="feature-label"></div>
+        <h2 class="feature-title">Lyvra AI - O futuro do marketing digital em um só clique.</h2>
+        <p class="feature-subtitle">Teste grátis e descubra como criar campanhas completas em segundos.
+        </p>
+        <div class="feature-buttons">
+          <a href="planos.html" target="_blank" class="btn-primary">Entrar para o Lyvra</a>
+          <!--<a href="#" class="btn-secondary">Ver planos</a>-->
+        </div>
+      </div>
+    </section>
+
+    <section class="leadership-section">
+      <div class="leadership-container">
+        <div class="leadership-text">
+          <h2>Feita por visionários, para visionários</h2>
+          <p>A Lyvra reúne especialistas em marketing e engenheiros de IA para criar ferramentas que permitem que
+            qualquer pessoa execute campanhas profissionais — sem precisar de agência.</p>
+          <a class="lead-btn" href="planos.html" target="_blank">Começar Agora</a>
+        </div>
+        <div class="leadership-image">
+          <img src="assets/lyvra2025.jpg" alt="Equipe Lyvra">
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-minimal">
+      <div class="footer-top">
+        <img src="assets/iconlogo.png" alt="Logo" class="footer-logo">
+        <div class="footer-brand">
+          <h4>Lyvra</h4>
+          <p>Transcendendo os Limites da Criatividade Humana</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-social">
+          <a href="https://www.instagram.com/lyvra.ai?igsh=MWY3bWtkODh1aWJhYg==" target="_blank" aria-label="Instagram">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+          </a>
+          <a href="https://www.facebook.com/share/17K1HxWjn1/" target="_blank" aria-label="Facebook">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook">
+          </a>
+          <a href="https://www.tiktok.com/@lyvra.ai?is_from_webapp=1&sender_device=pc" target="_blank" aria-label="TikTok">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
+          </a>
+          <a href="https://x.com/lyvraia?t=uMG-dkZD4xqeZ352p636mA&s=09" target="_blank" aria-label="X">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+          </a>
+          
+        </div>
+
+        <div>
+          © By <a href="#">Lyvra</a>. Todos os <strong>direitos reservados</strong>.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const track = document.querySelector('.carousel-track');
+      const slides = document.querySelectorAll('.carousel-slide');
+      const totalSlides = slides.length;
+      const indicatorsContainer = document.querySelector('.carousel-indicators');
+
+      let current = 0;
+      let startX = 0;
+      let currentTranslate = 0;
+      let prevTranslate = 0;
+      let dragging = false;
+      let autoplayInterval;
+      let animationId;
+
+      // cria indicadores (traços)
+      slides.forEach((_, i) => {
+        const indicator = document.createElement('div');
+        indicator.addEventListener('click', () => {
+          goToSlide(i);
+          resetAutoplay();
+        });
+        indicatorsContainer.appendChild(indicator);
+      });
+
+      const indicators = indicatorsContainer.querySelectorAll('div');
+
+      function updateIndicators() {
+        indicators.forEach((el, i) => {
+          el.classList.toggle('active', i === current);
+        });
+      }
+
+      function goToSlide(index) {
+        current = index;
+        track.style.transition = 'transform 0.8s ease';
+        track.style.transform = `translateX(-${index * 100}%)`;
+        updateIndicators();
+      }
+
+      function nextSlide() {
+        current = (current + 1) % totalSlides;
+        goToSlide(current);
+      }
+
+      function prevSlide() {
+        current = (current - 1 + totalSlides) % totalSlides;
+        goToSlide(current);
+      }
+
+      function startAutoplay() {
+        autoplayInterval = setInterval(nextSlide, 5000);
+      }
+
+      function stopAutoplay() {
+        clearInterval(autoplayInterval);
+      }
+
+      function resetAutoplay() {
+        stopAutoplay();
+        startAutoplay();
+      }
+
+     // 🖐 Eventos de toque / mouse (swipe)
+     //track.addEventListener('mousedown', dragStart);
+     // track.addEventListener('touchstart', dragStart, { passive: true });
+
+     //track.addEventListener('mousemove', dragMove);
+     // track.addEventListener('touchmove', dragMove, { passive: true });
+
+     // track.addEventListener('mouseup', dragEnd);
+     // track.addEventListener('mouseleave', dragEnd);
+     // track.addEventListener('touchend', dragEnd);
+
+      // Prevenir comportamento padrão de arrastar imagens
+      track.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+      });
+
+      function dragStart(e) {
+        stopAutoplay();
+        dragging = true;
+        track.style.transition = 'none';
+        startX = getPositionX(e);
+        prevTranslate = -current * getSlideWidth();
+        
+        // Cancelar qualquer animação em andamento
+        cancelAnimationFrame(animationId);
+      }
+
+      function dragMove(e) {
+        if (!dragging) return;
+        const currentX = getPositionX(e);
+        const diff = currentX - startX;
+        currentTranslate = prevTranslate + diff;
+        
+        // Usar requestAnimationFrame para melhor performance
+        animationId = requestAnimationFrame(() => {
+          track.style.transform = `translateX(${currentTranslate}px)`;
+        });
+      }
+
+      function dragEnd() {
+        if (!dragging) return;
+        dragging = false;
+        const movedBy = currentTranslate - prevTranslate;
+        const slideWidth = getSlideWidth();
+        const threshold = slideWidth * 0.1; // 10% do slide como threshold
+
+        if (movedBy < -threshold && current < totalSlides - 1) {
+          nextSlide();
+        } else if (movedBy > threshold && current > 0) {
+          prevSlide();
+        } else {
+          goToSlide(current);
+        }
+        startAutoplay();
+      }
+
+      function getPositionX(e) {
+        return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+      }
+      
+      function getSlideWidth() {
+        return track.clientWidth;
+      }
+
+      // Redimensionar o carrossel quando a janela for redimensionada
+      window.addEventListener('resize', () => {
+        goToSlide(current);
+      });
+
+      // inicializa
+      goToSlide(current);
+      updateIndicators();
+      startAutoplay();
+    });
+  </script>
+</body>
+</html>
