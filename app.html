@@ -205,7 +205,9 @@ button.generate {
 <div class="header">
   <div class="header-left">
     <img src="assets/logo.png" alt="Lyvra">
-    <span class="plan-badge" id="user-plan">Plano Free</span>
+    <div class="plan-badge" id="user-plan">
+      Plano Free • <span id="usageCount">0</span> / <span id="usageLimit">3</span>
+    </div>
   </div>
 
   <div class="header-right">
@@ -284,8 +286,41 @@ button.generate {
 const generateBtn = document.getElementById("generateBtn");
 const loadingBox = document.getElementById("loadingBox");
 const resultBox = document.getElementById("result");
+const usageCountEl = document.getElementById("usageCount");
+const usageLimitEl = document.getElementById("usageLimit");
+const upgradeBox = document.getElementById("upgradeBox");
+
+// CONFIGURAÇÃO INICIAL (mock)
+const userPlan = "free"; // depois virá do Firebase
+const limits = {
+  free: 3,
+  pro: 300,
+  business: Infinity
+};
+
+let usageCount = parseInt(localStorage.getItem("lyvra_usage")) || 0;
+const usageLimit = limits[userPlan];
+
+usageLimitEl.innerText = usageLimit === Infinity ? "∞" : usageLimit;
+usageCountEl.innerText = usageCount;
+
+// Função para bloquear quando atingir limite
+function checkLimit() {
+  if (usageCount >= usageLimit) {
+    generateBtn.disabled = true;
+    generateBtn.innerText = "Limite atingido";
+    upgradeBox.style.display = "block";
+    return true;
+  }
+  return false;
+}
+
+// Checar limite ao carregar
+checkLimit();
 
 generateBtn.addEventListener("click", async () => {
+  if (checkLimit()) return;
+
   const niche = document.getElementById("niche").value.trim();
   const goal = document.getElementById("goal").value;
 
@@ -300,7 +335,7 @@ generateBtn.addEventListener("click", async () => {
   loadingBox.style.display = "block";
   resultBox.style.display = "none";
 
-  // Simulação temporária (Make entra depois)
+  // Simulação temporária
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Mock de resposta
@@ -313,16 +348,25 @@ generateBtn.addEventListener("click", async () => {
   document.getElementById("imagePreview").src =
     "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
 
+  // Atualizar uso
+  usageCount++;
+  localStorage.setItem("lyvra_usage", usageCount);
+  usageCountEl.innerText = usageCount;
+
   // UI — finalizar loading
   loadingBox.style.display = "none";
   resultBox.style.display = "block";
   generateBtn.disabled = false;
   generateBtn.innerText = "Gerar conteúdo com IA";
 
-  // Scroll automático (UX ChatGPT)
+  // Scroll automático
   resultBox.scrollIntoView({ behavior: "smooth" });
+
+  // Checar limite novamente
+  checkLimit();
 });
 </script>
+
 
 
 </body>
