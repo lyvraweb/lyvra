@@ -41,72 +41,38 @@
   <h1>Login com sua conta Google</h1>
   <button id="btn-google">Entrar com Google</button>
 
-  <script>
-    // Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-      authDomain: "lyvra-e48a0.firebaseapp.com",
-      projectId: "lyvra-e48a0",
-      storageBucket: "lyvra-e48a0.appspot.com",
-      messagingSenderId: "1022305501638",
-      appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
-      measurementId: "G-EYHVTSZYPX"
-    };
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0"
+  };
 
-    // Função para lidar com login
-    document.getElementById('btn-google').addEventListener('click', async () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-        // Armazenando o UID do usuário no LocalStorage
-        localStorage.setItem('lyvra_uid', user.uid);
+  // Se já estiver logado, vai direto pro app
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      window.location.replace("/app.html");
+    }
+  });
 
-        // Verifica se tem redirecionamento da URL
-        const params = new URLSearchParams(window.location.search);
-        let redirect = params.get('redirect');
-        if (!redirect) {
-          redirect = '/app.html';  // Padrão redireciona para o app
-        }
-        
-        // Evita redirecionamento para rota inexistente
-        if (redirect === '/app') {
-          redirect = '/app.html';
-        }
-
-        // Redireciona para a página desejada após login
-        window.location.href = decodeURIComponent(redirect);
-
-      } catch (err) {
-        alert('Erro no login: ' + err.message);
-      }
-    });
-
-    // Verificação de estado do usuário
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // Usuario logado
-        const uid = user.uid;
-        const ref = db.collection('users').doc(uid);
-        const snap = await ref.get();
-
-        let plan = 'free';  // Padrão como free, se não encontrado
-
-        if (snap.exists) {
-          plan = snap.data().plan || 'free';
-        } else {
-          await ref.set({ plan: 'free' });  // Cria usuário se não existir
-        }
-
-        // Redireciona para o painel ou página conforme plano
-        window.location.href = '/app.html?plan=' + plan;
-      }
-    });
-  </script>
+  // Botão Google
+  document.getElementById("btn-google").onclick = async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      await auth.signInWithPopup(provider);
+      // redirect acontece automaticamente no listener acima
+    } catch (e) {
+      alert("Erro ao fazer login");
+    }
+  };
+</script>
 </body>
 </html>
