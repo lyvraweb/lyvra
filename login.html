@@ -70,56 +70,51 @@
     <button id="googleLogin">Entrar com Google</button>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-  <script>
-    /* ======================================================
-       FIREBASE INIT
-    ====================================================== */
-    const firebaseConfig = {
-      apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-      authDomain: "lyvra-e48a0.firebaseapp.com",
-      projectId: "lyvra-e48a0",
-      storageBucket: "lyvra-e48a0.appspot.com",
-      messagingSenderId: "1022305501638",
-      appId: "1:1022305501638:web:05d299b9a235189c2bb2c7"
-    };
+<script>
+  /* ==========================
+     CONFIG FIREBASE
+  ========================== */
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0",
+    storageBucket: "lyvra-e48a0.appspot.com",
+    messagingSenderId: "1022305501638",
+    appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
+    measurementId: "G-EYHVTSZYPX"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-    /* ======================================================
-       SE JÁ ESTIVER LOGADO → APP
-    ====================================================== */
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        window.location.replace("/app.html");
-      }
-    });
+  /* ==========================
+     SE JÁ ESTIVER LOGADO → APP
+  ========================== */
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // Sessão já existe, vai direto para o app
+      window.location.replace("/app.html");
+    }
+  });
 
-    /* ======================================================
-       LOGIN GOOGLE
-    ====================================================== */
-    const btn = document.getElementById("googleLogin");
+  /* ==========================
+     LOGIN GOOGLE
+  ========================== */
+  document.getElementById("btn-google").addEventListener("click", async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-    btn.addEventListener("click", async () => {
-      btn.disabled = true;
-      btn.innerText = "Entrando...";
-
-      const provider = new firebase.auth.GoogleAuthProvider();
-
-      try {
-        await auth.signInWithPopup(provider);
-        // redirect acontece automaticamente via onAuthStateChanged
-      } catch (err) {
-        alert("Erro ao fazer login: " + err.message);
-        btn.disabled = false;
-        btn.innerText = "Entrar com Google";
-      }
-    });
-  </script>
-
+    try {
+      await auth.signInWithPopup(provider);
+      // Não redireciona aqui!
+      // O onAuthStateChanged cuida disso
+    } catch (error) {
+      alert("Erro ao fazer login: " + error.message);
+    }
+  });
+</script>
 </body>
 </html>
