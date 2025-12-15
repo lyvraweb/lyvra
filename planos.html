@@ -261,6 +261,12 @@ footer p {
   <p>Transcendendo os Limites da Criatividade Humana</p>
   <p>© 2025 Lyvra. Todos os direitos reservados.</p>
 </footer>
+<script>
+const uidFromURL = new URLSearchParams(window.location.search).get("uid");
 
+if (uidFromURL) {
+  localStorage.setItem("lyvra_uid", uidFromURL);
+}
+</script>
 </body>
 </html>
