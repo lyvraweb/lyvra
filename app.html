@@ -283,6 +283,7 @@ button.generate {
 <div class="footer-space"></div>
 
 <script>
+/* ===== ELEMENTOS ===== */
 const generateBtn = document.getElementById("generateBtn");
 const loadingBox = document.getElementById("loadingBox");
 const resultBox = document.getElementById("result");
@@ -290,84 +291,96 @@ const usageCountEl = document.getElementById("usageCount");
 const usageLimitEl = document.getElementById("usageLimit");
 const upgradeBox = document.getElementById("upgradeBox");
 
-// CONFIGURAÇÃO INICIAL (mock)
-const userPlan = "free"; // depois virá do Firebase
+/* ===== MOCK TEMPORÁRIO (depois vem do Firebase) ===== */
+const user = {
+  uid: localStorage.getItem("lyvra_uid") || ("uid_" + Math.random().toString(36).slice(2)),
+  plan: localStorage.getItem("lyvra_plan") || "free"
+};
+
+localStorage.setItem("lyvra_uid", user.uid);
+localStorage.setItem("lyvra_plan", user.plan);
+
+/* ===== LIMITES ===== */
 const limits = {
   free: 3,
   pro: 300,
   business: Infinity
 };
 
-let usageCount = parseInt(localStorage.getItem("lyvra_usage")) || 0;
-const usageLimit = limits[userPlan];
+const usageKey = `lyvra_usage_${user.uid}`;
+let usageCount = parseInt(localStorage.getItem(usageKey)) || 0;
+const usageLimit = limits[user.plan];
 
+/* ===== UI INICIAL ===== */
 usageLimitEl.innerText = usageLimit === Infinity ? "∞" : usageLimit;
 usageCountEl.innerText = usageCount;
 
-// Função para bloquear quando atingir limite
+/* ===== FUNÇÃO DE LIMITE ===== */
 function checkLimit() {
   if (usageCount >= usageLimit) {
     generateBtn.disabled = true;
     generateBtn.innerText = "Limite atingido";
-    upgradeBox.style.display = "block";
+    upgradeBox.style.display = user.plan === "free" ? "block" : "none";
     return true;
   }
+
+  generateBtn.disabled = false;
+  generateBtn.innerText = "Gerar conteúdo com IA";
+  upgradeBox.style.display = "none";
   return false;
 }
 
-// Checar limite ao carregar
 checkLimit();
 
+/* ===== EVENTO GERAR ===== */
 generateBtn.addEventListener("click", async () => {
   if (checkLimit()) return;
 
   const niche = document.getElementById("niche").value.trim();
-  const goal = document.getElementById("goal").value;
-
   if (!niche) {
     alert("Informe o nicho para gerar o conteúdo.");
     return;
   }
 
-  // UI — iniciar loading
   generateBtn.disabled = true;
   generateBtn.innerText = "Gerando...";
   loadingBox.style.display = "block";
   resultBox.style.display = "none";
 
-  // Simulação temporária
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(r => setTimeout(r, 2000));
 
-  // Mock de resposta
   document.getElementById("ideaText").innerText =
     "3 erros comuns que estão impedindo seu Instagram de crescer";
 
   document.getElementById("copyText").innerText =
-    "Você está postando com frequência, mas não vê resultados? Talvez esteja cometendo erros simples que sabotam seu crescimento. Descubra agora como corrigir e crescer de verdade.";
+    "Você está postando, mas não cresce porque pequenos erros estão sabotando seu alcance. Veja como corrigir agora.";
 
   document.getElementById("imagePreview").src =
     "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
 
-  // Atualizar uso
   usageCount++;
-  localStorage.setItem("lyvra_usage", usageCount);
+  localStorage.setItem(usageKey, usageCount);
   usageCountEl.innerText = usageCount;
 
-  // UI — finalizar loading
   loadingBox.style.display = "none";
   resultBox.style.display = "block";
   generateBtn.disabled = false;
   generateBtn.innerText = "Gerar conteúdo com IA";
 
-  // Scroll automático
   resultBox.scrollIntoView({ behavior: "smooth" });
 
-  // Checar limite novamente
   checkLimit();
 });
+
+/* ===== BOTÕES SEMPRE FUNCIONAIS ===== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("lyvra_uid");
+  window.location.href = "/index.html";
+});
+
+document.getElementById("upgradeBtn").addEventListener("click", () => {
+  window.location.href = "/planos.html";
+});
 </script>
-
-
-
 </body>
 </html>
