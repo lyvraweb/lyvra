@@ -180,6 +180,22 @@ button.generate {
 .footer-space {
   height: 80px;
 }
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #111827;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+  
 </style>
 </head>
 
@@ -221,6 +237,12 @@ button.generate {
     </div>
 
     <button class="generate" id="generateBtn">Gerar conteúdo com IA</button>
+    <div id="loadingBox" style="display:none; margin-top:20px;">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="spinner"></div>
+    <span id="loadingText">Lyvra está criando seu conteúdo...</span>
+  </div>
+</div>
 
   </div>
 
@@ -259,38 +281,49 @@ button.generate {
 <div class="footer-space"></div>
 
 <script>
-/*
-  ESTE BLOCO SIMULA O RETORNO DO MAKE.
-  Depois você só substitui pelo fetch real.
-*/
+const generateBtn = document.getElementById("generateBtn");
+const loadingBox = document.getElementById("loadingBox");
+const resultBox = document.getElementById("result");
 
-document.getElementById("generateBtn").addEventListener("click", () => {
-  document.getElementById("result").style.display = "block";
+generateBtn.addEventListener("click", async () => {
+  const niche = document.getElementById("niche").value.trim();
+  const goal = document.getElementById("goal").value;
 
-  // SIMULA JSON DO MAKE
-  const response = {
-    idea: "3 erros comuns que estão impedindo seu Instagram de crescer",
-    text: "Você está postando, mas não vê resultados? Talvez esteja cometendo erros silenciosos que sabotam seu alcance.",
-    image_url: "https://via.placeholder.com/600x600.png?text=Lyvra+AI",
-    watermark: true, // ← Free = true | Pro = false
-    plan: "free"
-  };
-
-  document.getElementById("ideaText").innerText = response.idea;
-  document.getElementById("copyText").innerText = response.text;
-  document.getElementById("imagePreview").src = response.image_url;
-
-  if (response.watermark === true) {
-    document.getElementById("watermark").style.display = "block";
-    document.getElementById("upgradeBox").style.display = "block";
-    document.getElementById("user-plan").innerText = "Plano Free";
-  } else {
-    document.getElementById("watermark").style.display = "none";
-    document.getElementById("upgradeBox").style.display = "none";
-    document.getElementById("user-plan").innerText = "Plano Pro";
+  if (!niche) {
+    alert("Informe o nicho para gerar o conteúdo.");
+    return;
   }
+
+  // UI — iniciar loading
+  generateBtn.disabled = true;
+  generateBtn.innerText = "Gerando...";
+  loadingBox.style.display = "block";
+  resultBox.style.display = "none";
+
+  // Simulação temporária (Make entra depois)
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Mock de resposta
+  document.getElementById("ideaText").innerText =
+    "3 erros comuns que estão impedindo seu Instagram de crescer";
+
+  document.getElementById("copyText").innerText =
+    "Você está postando com frequência, mas não vê resultados? Talvez esteja cometendo erros simples que sabotam seu crescimento. Descubra agora como corrigir e crescer de verdade.";
+
+  document.getElementById("imagePreview").src =
+    "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
+
+  // UI — finalizar loading
+  loadingBox.style.display = "none";
+  resultBox.style.display = "block";
+  generateBtn.disabled = false;
+  generateBtn.innerText = "Gerar conteúdo com IA";
+
+  // Scroll automático (UX ChatGPT)
+  resultBox.scrollIntoView({ behavior: "smooth" });
 });
 </script>
+
 
 </body>
 </html>
