@@ -1,54 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Login — Lyvra</title>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f0f0;
-      text-align: center;
-    }
-    h1 {
-      margin-top: 50px;
-    }
-    #btn-google {
-      background-color: #4285f4;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    #btn-google:hover {
-      background-color: #357ae8;
-    }
-  </style>
 </head>
-
 <body>
 
-  <h1>Login com sua conta Google</h1>
-  <button id="btn-google">Entrar com Google</button>
+<h1>Login Lyvra</h1>
+<button id="btn-google">Entrar com Google</button>
 
-  <!-- Firebase SDKs -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
 <script>
-  // Firebase config
   const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
+    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
     authDomain: "lyvra-e48a0.firebaseapp.com",
     projectId: "lyvra-e48a0"
   };
@@ -63,16 +30,16 @@
     }
   });
 
-  // Botão Google
   document.getElementById("btn-google").onclick = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
       await auth.signInWithPopup(provider);
-      // redirect acontece automaticamente no listener acima
-    } catch (e) {
-      alert("Erro ao fazer login");
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
     }
   };
 </script>
+
 </body>
 </html>
