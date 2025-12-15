@@ -283,15 +283,23 @@ button.generate {
 <div class="footer-space"></div>
 
 <script>
-/* ===== ELEMENTOS ===== */
+/* ========= UTIL ========= */
+function getPlanFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("plan");
+}
+
+/* ========= ELEMENTOS ========= */
 const generateBtn = document.getElementById("generateBtn");
 const loadingBox = document.getElementById("loadingBox");
 const resultBox = document.getElementById("result");
 const usageCountEl = document.getElementById("usageCount");
 const usageLimitEl = document.getElementById("usageLimit");
 const upgradeBox = document.getElementById("upgradeBox");
+const watermarkEl = document.getElementById("watermark");
+const userPlanEl = document.getElementById("user-plan");
 
-/* ===== MOCK TEMPORÁRIO (depois vem do Firebase) ===== */
+/* ========= USUÁRIO ========= */
 const urlPlan = getPlanFromURL();
 
 const user = {
@@ -302,40 +310,44 @@ const user = {
 localStorage.setItem("lyvra_uid", user.uid);
 localStorage.setItem("lyvra_plan", user.plan);
 
-  document.getElementById("user-plan").innerText =
-  `Plano ${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} • `;
-
-
-  function getPlanFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("plan");
-}
-
-
-localStorage.setItem("lyvra_uid", user.uid);
-localStorage.setItem("lyvra_plan", user.plan);
-
-/* ===== LIMITES ===== */
+/* ========= LIMITES ========= */
 const limits = {
   free: 3,
   pro: 300,
   business: Infinity
 };
 
-const usageKey = `lyvra_usage_${user.uid}`;
+/* ========= CONTADOR MENSAL ========= */
+const now = new Date();
+const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+const usageKey = `lyvra_usage_${user.uid}_${monthKey}`;
+
 let usageCount = parseInt(localStorage.getItem(usageKey)) || 0;
 const usageLimit = limits[user.plan];
 
-/* ===== UI INICIAL ===== */
-usageLimitEl.innerText = usageLimit === Infinity ? "∞" : usageLimit;
-usageCountEl.innerText = usageCount;
+/* ========= HEADER ========= */
+userPlanEl.innerHTML = `
+  Plano ${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} • 
+  <span id="usageCount">${usageCount}</span> / 
+  <span id="usageLimit">${usageLimit === Infinity ? "∞" : usageLimit}</span>
+`;
 
-/* ===== FUNÇÃO DE LIMITE ===== */
+/* ========= WATERMARK ========= */
+if (user.plan === "free") {
+  watermarkEl.style.display = "block";
+} else {
+  watermarkEl.style.display = "none";
+}
+
+/* ========= FUNÇÃO DE LIMITE ========= */
 function checkLimit() {
   if (usageCount >= usageLimit) {
     generateBtn.disabled = true;
     generateBtn.innerText = "Limite atingido";
-    upgradeBox.style.display = user.plan === "free" ? "block" : "none";
+
+    if (user.plan === "free") {
+      upgradeBox.style.display = "block";
+    }
     return true;
   }
 
@@ -347,7 +359,7 @@ function checkLimit() {
 
 checkLimit();
 
-/* ===== EVENTO GERAR ===== */
+/* ========= GERAR ========= */
 generateBtn.addEventListener("click", async () => {
   if (checkLimit()) return;
 
@@ -362,20 +374,22 @@ generateBtn.addEventListener("click", async () => {
   loadingBox.style.display = "block";
   resultBox.style.display = "none";
 
+  // SIMULAÇÃO (Make entra depois)
   await new Promise(r => setTimeout(r, 2000));
 
   document.getElementById("ideaText").innerText =
     "3 erros comuns que estão impedindo seu Instagram de crescer";
 
   document.getElementById("copyText").innerText =
-    "Você está postando, mas não cresce porque pequenos erros estão sabotando seu alcance. Veja como corrigir agora.";
+    "Você está postando, mas pequenos erros estão sabotando seu alcance. Veja como corrigir agora.";
 
   document.getElementById("imagePreview").src =
     "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
 
   usageCount++;
   localStorage.setItem(usageKey, usageCount);
-  usageCountEl.innerText = usageCount;
+
+  document.getElementById("usageCount").innerText = usageCount;
 
   loadingBox.style.display = "none";
   resultBox.style.display = "block";
@@ -387,7 +401,7 @@ generateBtn.addEventListener("click", async () => {
   checkLimit();
 });
 
-/* ===== BOTÕES SEMPRE FUNCIONAIS ===== */
+/* ========= BOTÕES ========= */
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("lyvra_uid");
   window.location.href = "/index.html";
