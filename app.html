@@ -136,11 +136,28 @@ button.generate {
   margin-bottom: 15px;
 }
 
+/* IMAGE + WATERMARK */
+.image-wrapper {
+  position: relative;
+  margin-top: 12px;
+}
+
+.image-wrapper img {
+  width: 100%;
+  border-radius: 12px;
+}
+
 .watermark {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  margin-top: 8px;
-  text-align: right;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: none;
+  pointer-events: none;
 }
 
 /* UPGRADE */
@@ -163,7 +180,6 @@ button.generate {
 .footer-space {
   height: 80px;
 }
-
 </style>
 </head>
 
@@ -212,20 +228,23 @@ button.generate {
   <div class="result" id="result">
     <h2>Resultado</h2>
 
-    <div class="result-box" id="ideaBox">
+    <div class="result-box">
       <strong>Ideia:</strong>
       <p id="ideaText"></p>
     </div>
 
-    <div class="result-box" id="copyBox">
+    <div class="result-box">
       <strong>Legenda:</strong>
       <p id="copyText"></p>
     </div>
 
-    <div class="result-box" id="imageBox">
+    <div class="result-box">
       <strong>Imagem:</strong>
-      <img id="imagePreview" style="max-width:100%; border-radius:10px; margin-top:10px;">
-      <div class="watermark">Gerado com Lyvra AI</div>
+
+      <div class="image-wrapper">
+        <img id="imagePreview" />
+        <div class="watermark" id="watermark">Criado com Lyvra AI</div>
+      </div>
     </div>
 
     <div class="upgrade" id="upgradeBox">
@@ -240,25 +259,36 @@ button.generate {
 <div class="footer-space"></div>
 
 <script>
-/* AQUI entraremos com:
-   - Firebase Auth
-   - Verificação de plano
-   - Chamada para Make.com
-   - Controle de limite
+/*
+  ESTE BLOCO SIMULA O RETORNO DO MAKE.
+  Depois você só substitui pelo fetch real.
 */
 
 document.getElementById("generateBtn").addEventListener("click", () => {
   document.getElementById("result").style.display = "block";
 
-  // MOCK TEMPORÁRIO
-  document.getElementById("ideaText").innerText =
-    "3 erros comuns que estão impedindo seu Instagram de crescer";
+  // SIMULA JSON DO MAKE
+  const response = {
+    idea: "3 erros comuns que estão impedindo seu Instagram de crescer",
+    text: "Você está postando, mas não vê resultados? Talvez esteja cometendo erros silenciosos que sabotam seu alcance.",
+    image_url: "https://via.placeholder.com/600x600.png?text=Lyvra+AI",
+    watermark: true, // ← Free = true | Pro = false
+    plan: "free"
+  };
 
-  document.getElementById("copyText").innerText =
-    "Você está postando, mas não vê resultados? Talvez esteja cometendo um desses erros sem perceber. Descubra agora e comece a crescer de verdade.";
+  document.getElementById("ideaText").innerText = response.idea;
+  document.getElementById("copyText").innerText = response.text;
+  document.getElementById("imagePreview").src = response.image_url;
 
-  document.getElementById("imagePreview").src =
-    "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
+  if (response.watermark === true) {
+    document.getElementById("watermark").style.display = "block";
+    document.getElementById("upgradeBox").style.display = "block";
+    document.getElementById("user-plan").innerText = "Plano Free";
+  } else {
+    document.getElementById("watermark").style.display = "none";
+    document.getElementById("upgradeBox").style.display = "none";
+    document.getElementById("user-plan").innerText = "Plano Pro";
+  }
 });
 </script>
 
