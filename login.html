@@ -3,99 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Entrar — Lyvra</title>
+  <title>Login — Lyvra</title>
 
-  <link rel="icon" href="assets/favicon.png" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f7f7f8;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 32px;
-      width: 100%;
-      max-width: 380px;
+      padding: 0;
+      background-color: #f0f0f0;
       text-align: center;
     }
-
-    img {
-      height: 36px;
-      margin-bottom: 20px;
-    }
-
     h1 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
+      margin-top: 50px;
     }
-
-    p {
-      font-size: 0.95rem;
-      color: #6b7280;
-      margin-bottom: 24px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-      background: #111827;
+    #btn-google {
+      background-color: #4285f4;
       color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
     }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    #btn-google:hover {
+      background-color: #357ae8;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="card">
-    <img src="assets/logo.png" alt="Lyvra" />
-    <h1>Entrar no Lyvra</h1>
-    <p>Use sua conta Google para continuar</p>
-    <button id="googleLogin">Entrar com Google</button>
-  </div>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <h1>Login com sua conta Google</h1>
+  <button id="btn-google">Entrar com Google</button>
 
-<script>
-/* ===== FIREBASE INIT (SAFE) ===== */
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "lyvra-e48a0.firebaseapp.com",
-  projectId: "lyvra-e48a0"
-};
+  <script>
+    // Configuração Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+      authDomain: "lyvra-e48a0.firebaseapp.com",
+      projectId: "lyvra-e48a0",
+      storageBucket: "lyvra-e48a0.appspot.com",
+      messagingSenderId: "1022305501638",
+      appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
+      measurementId: "G-EYHVTSZYPX"
+    };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-const auth = firebase.auth();
+    // Função para lidar com login
+    document.getElementById('btn-google').addEventListener('click', async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
 
-/* ===== BOTÃO LOGIN ===== */
-document.getElementById("btn-google").addEventListener("click", async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  try {
-    await auth.signInWithPopup(provider);
-    window.location.replace("/app.html");
-  } catch (err) {
-    alert(err.message);
-  }
-});
-</script>
+        // Armazenando o UID do usuário no LocalStorage
+        localStorage.setItem('lyvra_uid', user.uid);
+
+        // Verifica se tem redirecionamento da URL
+        const params = new URLSearchParams(window.location.search);
+        let redirect = params.get('redirect');
+        if (!redirect) {
+          redirect = '/app.html';  // Padrão redireciona para o app
+        }
+        
+        // Evita redirecionamento para rota inexistente
+        if (redirect === '/app') {
+          redirect = '/app.html';
+        }
+
+        // Redireciona para a página desejada após login
+        window.location.href = decodeURIComponent(redirect);
+
+      } catch (err) {
+        alert('Erro no login: ' + err.message);
+      }
+    });
+
+    // Verificação de estado do usuário
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Usuario logado
+        const uid = user.uid;
+        const ref = db.collection('users').doc(uid);
+        const snap = await ref.get();
+
+        let plan = 'free';  // Padrão como free, se não encontrado
+
+        if (snap.exists) {
+          plan = snap.data().plan || 'free';
+        } else {
+          await ref.set({ plan: 'free' });  // Cria usuário se não existir
+        }
+
+        // Redireciona para o painel ou página conforme plano
+        window.location.href = '/app.html?plan=' + plan;
+      }
+    });
+  </script>
 </body>
 </html>
