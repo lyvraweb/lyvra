@@ -69,52 +69,33 @@
     <p>Use sua conta Google para continuar</p>
     <button id="googleLogin">Entrar com Google</button>
   </div>
-
-  <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
 <script>
-  /* ==========================
-     CONFIG FIREBASE
-  ========================== */
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-    authDomain: "lyvra-e48a0.firebaseapp.com",
-    projectId: "lyvra-e48a0",
-    storageBucket: "lyvra-e48a0.appspot.com",
-    messagingSenderId: "1022305501638",
-    appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
-    measurementId: "G-EYHVTSZYPX"
-  };
+/* ===== FIREBASE INIT (SAFE) ===== */
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "lyvra-e48a0.firebaseapp.com",
+  projectId: "lyvra-e48a0"
+};
 
+if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+}
 
-  /* ==========================
-     SE JÁ ESTIVER LOGADO → APP
-  ========================== */
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // Sessão já existe, vai direto para o app
-      window.location.replace("/app.html");
-    }
-  });
+const auth = firebase.auth();
 
-  /* ==========================
-     LOGIN GOOGLE
-  ========================== */
-  document.getElementById("btn-google").addEventListener("click", async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    try {
-      await auth.signInWithPopup(provider);
-      // Não redireciona aqui!
-      // O onAuthStateChanged cuida disso
-    } catch (error) {
-      alert("Erro ao fazer login: " + error.message);
-    }
-  });
+/* ===== BOTÃO LOGIN ===== */
+document.getElementById("btn-google").addEventListener("click", async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    await auth.signInWithPopup(provider);
+    window.location.replace("/app.html");
+  } catch (err) {
+    alert(err.message);
+  }
+});
 </script>
 </body>
 </html>
