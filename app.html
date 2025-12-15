@@ -179,8 +179,14 @@ const limits = { free: 3, pro: 300, business: Infinity };
 
 /* ================= AUTH ================= */
 auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    window.location.href = "/login.html";
+
+  // Aguarda o Firebase restaurar a sessão
+  if (user === null) {
+    setTimeout(() => {
+      if (!auth.currentUser) {
+        window.location.href = "/login.html";
+      }
+    }, 800);
     return;
   }
 
