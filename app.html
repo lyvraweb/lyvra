@@ -292,10 +292,25 @@ const usageLimitEl = document.getElementById("usageLimit");
 const upgradeBox = document.getElementById("upgradeBox");
 
 /* ===== MOCK TEMPORÁRIO (depois vem do Firebase) ===== */
+const urlPlan = getPlanFromURL();
+
 const user = {
   uid: localStorage.getItem("lyvra_uid") || ("uid_" + Math.random().toString(36).slice(2)),
-  plan: localStorage.getItem("lyvra_plan") || "free"
+  plan: urlPlan || localStorage.getItem("lyvra_plan") || "free"
 };
+
+localStorage.setItem("lyvra_uid", user.uid);
+localStorage.setItem("lyvra_plan", user.plan);
+
+  document.getElementById("user-plan").innerText =
+  `Plano ${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} • `;
+
+
+  function getPlanFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("plan");
+}
+
 
 localStorage.setItem("lyvra_uid", user.uid);
 localStorage.setItem("lyvra_plan", user.plan);
