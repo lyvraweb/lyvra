@@ -1,110 +1,125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <title>Login — Lyvra</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-white flex items-center justify-center min-h-screen p-6">
-   <div class="w-full max-w-md mx-auto text-center">
-    <img src="assets/logo.png" alt="Lyvra Logo" class="mx-auto w-40 mb-10">
-    <h1 class="text-3xl font-bold text-gray-900 mb-3">Bem-vindo</h1>
-    <p class="text-gray-500 mb-10">Entre para continuar</p>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — Lyvra</title>
 
-    <div id="errorBox" class="hidden bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-sm"></div>
+  <link rel="icon" href="assets/favicon.png" />
 
-    <!-- Botões -->
-    <button id="appleLogin" onclick="socialLogin('apple')" class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 py-3 rounded-xl font-medium transition mb-3">
-      <img src="assets/apple-logo.png" alt="Apple Login" class="w-5 h-5"> Entrar com Apple
-    </button>
-
-    <button id="btn-google" onclick="socialLogin('google')" class="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 py-3 rounded-xl font-medium transition mb-3">
-      <img src="assets/google-logo.png" alt="Google Login" class="w-5 h-5"> Entrar com Google
-    </button>
-
-    <p class="text-sm text-gray-400">Ao continuar, você concorda com os Termos de Uso da Lyvra.</p>
-  </div>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
-<script>
-/* ======================================================
-   FIREBASE CONFIG
-====================================================== */
-const firebaseConfig = {
-  apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-  authDomain: "lyvra-e48a0.firebaseapp.com",
-  projectId: "lyvra-e48a0",
-  storageBucket: "lyvra-e48a0.appspot.com",
-  messagingSenderId: "1022305501638",
-  appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
-  measurementId: "G-EYHVTSZYPX"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-/* ======================================================
-   REDIRECT UTIL
-====================================================== */
-function getRedirectTarget() {
-  const params = new URLSearchParams(window.location.search);
-  let redirect = params.get("redirect");
-
-  if (!redirect) return "/app.html";
-
-  redirect = decodeURIComponent(redirect);
-
-  // proteção contra rotas inválidas
-  if (redirect === "/app" || redirect === "/login.html") {
-    return "/app.html";
-  }
-
-  return redirect;
-}
-
-/* ======================================================
-   LOGIN COM GOOGLE
-====================================================== */
-document.getElementById("btn-google").addEventListener("click", async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  try {
-    const result = await auth.signInWithPopup(provider);
-    const user = result.user;
-
-    if (!user || !user.uid) {
-      throw new Error("Falha ao obter UID do usuário.");
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f7f7f8;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
 
-    /* UID GLOBAL — nunca muda */
-    localStorage.setItem("lyvra_uid", user.uid);
-    localStorage.setItem("lyvra_email", user.email || "");
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 32px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
 
-    /* redirecionamento seguro */
-    window.location.href = getRedirectTarget();
+    img {
+      height: 36px;
+      margin-bottom: 20px;
+    }
 
-  } catch (err) {
-    console.error("Erro login:", err);
-    alert("Erro ao fazer login: " + err.message);
-  }
-});
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
 
-/* ======================================================
-   AUTO-REDIRECT SE JÁ LOGADO
-====================================================== */
-auth.onAuthStateChanged(user => {
-  if (user) {
-    localStorage.setItem("lyvra_uid", user.uid);
-    localStorage.setItem("lyvra_email", user.email || "");
-    window.location.href = getRedirectTarget();
-  }
-});
-</script>
+    p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #111827;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img src="assets/logo.png" alt="Lyvra" />
+    <h1>Entrar no Lyvra</h1>
+    <p>Use sua conta Google para continuar</p>
+    <button id="googleLogin">Entrar com Google</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    /* ======================================================
+       FIREBASE INIT
+    ====================================================== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+      authDomain: "lyvra-e48a0.firebaseapp.com",
+      projectId: "lyvra-e48a0",
+      storageBucket: "lyvra-e48a0.appspot.com",
+      messagingSenderId: "1022305501638",
+      appId: "1:1022305501638:web:05d299b9a235189c2bb2c7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    /* ======================================================
+       SE JÁ ESTIVER LOGADO → APP
+    ====================================================== */
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        window.location.replace("/app.html");
+      }
+    });
+
+    /* ======================================================
+       LOGIN GOOGLE
+    ====================================================== */
+    const btn = document.getElementById("googleLogin");
+
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      btn.innerText = "Entrando...";
+
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      try {
+        await auth.signInWithPopup(provider);
+        // redirect acontece automaticamente via onAuthStateChanged
+      } catch (err) {
+        alert("Erro ao fazer login: " + err.message);
+        btn.disabled = false;
+        btn.innerText = "Entrar com Google";
+      }
+    });
+  </script>
 
 </body>
 </html>
