@@ -392,7 +392,8 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 });
 
 document.getElementById("upgradeBtn").addEventListener("click", () => {
-  window.location.href = "/planos.html";
+  const uid = localStorage.getItem("lyvra_uid");
+  window.location.href = `/planos.html?uid=${uid}`;
 });
 </script>
 </body>
