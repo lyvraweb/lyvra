@@ -1,35 +1,124 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Checkout — Lyvra</title></head>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Checkout — Lyvra</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f7f7f8;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 80px auto;
+      background: white;
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #6b7280;
+      margin-bottom: 25px;
+    }
+
+    button {
+      width: 100%;
+      background: #111827;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
 <body>
-  <main class="container">
-    <h1>Finalizar Assinatura</h1>
-    <p id="plan-info">Carregando plano...</p>
-    <button id="pay">Pagar com Stripe</button>
-    <script>
-        const firebaseConfig = {
-    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-    authDomain: "lyvra-e48a0.firebaseapp.com",
-    projectId: "lyvra-e48a0",
-    storageBucket: "lyvra-e48a0.firebasestorage.app",
-    messagingSenderId: "1022305501638",
-    appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
-    measurementId: "G-EYHVTSZYPX"
-  };
-      async function fetchCreateSession(plan){
-        const body = { plan, email: 'test@example.com', uid: 'anon' };
-        const res = await fetch('/api/create-checkout-session', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        if(data.url) window.location.href = data.url;
-        else alert('Erro ao criar sessão: ' + (data.error || 'unknown'));
-      }
-      const params = new URLSearchParams(window.location.search);
-      const plan = params.get('plan') || 'pro';
-      document.getElementById('plan-info').innerText = 'Plano: ' + plan;
-      document.getElementById('pay').addEventListener('click', () => fetchCreateSession(plan));
-    </script>
-  </main>
+
+<main class="container">
+  <h1>Finalizar assinatura</h1>
+  <p id="plan-info">Carregando plano...</p>
+  <button id="payBtn">Continuar para pagamento</button>
+</main>
+
+<script>
+/* ===============================
+   SEGURANÇA: USUÁRIO LOGADO
+================================ */
+const uid = localStorage.getItem("lyvra_uid");
+
+if (!uid) {
+  // não existe sessão
+  window.location.href = "/login.html";
+}
+
+/* ===============================
+   PLANO
+================================ */
+const params = new URLSearchParams(window.location.search);
+const plan = params.get("plan");
+
+const allowedPlans = ["pro", "business"];
+
+if (!plan || !allowedPlans.includes(plan)) {
+  alert("Plano inválido.");
+  window.location.href = "/planos.html";
+}
+
+document.getElementById("plan-info").innerText =
+  `Plano selecionado: ${plan.charAt(0).toUpperCase() + plan.slice(1)}`;
+
+/* ===============================
+   STRIPE CHECKOUT
+================================ */
+const payBtn = document.getElementById("payBtn");
+
+payBtn.addEventListener("click", async () => {
+  payBtn.disabled = true;
+  payBtn.innerText = "Redirecionando...";
+
+  try {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan,
+        uid
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || "Erro desconhecido");
+    }
+  } catch (err) {
+    alert("Erro ao iniciar pagamento: " + err.message);
+    payBtn.disabled = false;
+    payBtn.innerText = "Continuar para pagamento";
+  }
+});
+</script>
+
 </body>
 </html>
