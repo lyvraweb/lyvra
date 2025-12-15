@@ -27,52 +27,84 @@
     <p class="text-sm text-gray-400">Ao continuar, você concorda com os Termos de Uso da Lyvra.</p>
   </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-    <script>
-      // Configuração Firebase
-      const firebaseConfig = {
-        apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-        authDomain: "lyvra-e48a0.firebaseapp.com",
-        projectId: "lyvra-e48a0",
-        storageBucket: "lyvra-e48a0.appspot.com",
-        messagingSenderId: "1022305501638",
-        appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
-        measurementId: "G-EYHVTSZYPX"
-      };
+<script>
+/* ======================================================
+   FIREBASE CONFIG
+====================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+  authDomain: "lyvra-e48a0.firebaseapp.com",
+  projectId: "lyvra-e48a0",
+  storageBucket: "lyvra-e48a0.appspot.com",
+  messagingSenderId: "1022305501638",
+  appId: "1:1022305501638:web:05d299b9a235189c2bb2c7",
+  measurementId: "G-EYHVTSZYPX"
+};
 
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-      document.getElementById('btn-google').addEventListener('click', async () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
+/* ======================================================
+   REDIRECT UTIL
+====================================================== */
+function getRedirectTarget() {
+  const params = new URLSearchParams(window.location.search);
+  let redirect = params.get("redirect");
 
-        try {
-          const result = await auth.signInWithPopup(provider);
-          const user = result.user;
+  if (!redirect) return "/app.html";
 
-          // obter redirect da querystring corretamente
-          const params = new URLSearchParams(window.location.search);
-          let redirect = params.get('redirect');
+  redirect = decodeURIComponent(redirect);
 
-          // se não existir redirect, manda para app.html
-          if (!redirect) {
-            redirect = '/app.html';
-          }
+  // proteção contra rotas inválidas
+  if (redirect === "/app" || redirect === "/login.html") {
+    return "/app.html";
+  }
 
-          // garantir que não direciona para /app (rota inexistente)
-          if (redirect === '/app') {
-            redirect = '/app.html';
-          }
+  return redirect;
+}
 
-          window.location.href = decodeURIComponent(redirect);
+/* ======================================================
+   LOGIN COM GOOGLE
+====================================================== */
+document.getElementById("btn-google").addEventListener("click", async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
 
-        } catch (err) {
-          alert('Erro no login: ' + err.message);
-        }
-      });
-    </script>
+  try {
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+
+    if (!user || !user.uid) {
+      throw new Error("Falha ao obter UID do usuário.");
+    }
+
+    /* UID GLOBAL — nunca muda */
+    localStorage.setItem("lyvra_uid", user.uid);
+    localStorage.setItem("lyvra_email", user.email || "");
+
+    /* redirecionamento seguro */
+    window.location.href = getRedirectTarget();
+
+  } catch (err) {
+    console.error("Erro login:", err);
+    alert("Erro ao fazer login: " + err.message);
+  }
+});
+
+/* ======================================================
+   AUTO-REDIRECT SE JÁ LOGADO
+====================================================== */
+auth.onAuthStateChanged(user => {
+  if (user) {
+    localStorage.setItem("lyvra_uid", user.uid);
+    localStorage.setItem("lyvra_email", user.email || "");
+    window.location.href = getRedirectTarget();
+  }
+});
+</script>
+
 </body>
 </html>
