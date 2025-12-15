@@ -1,221 +1,399 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Painel — Lyvra</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel — Lyvra</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link rel="icon" type="image/png" href="assets/favicon.png">
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f7f7f8;
+      color: #111827;
+    }
 
-<style>
-/* === ESTILOS (inalterados) === */
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  background: #f7f7f8;
-  color: #111827;
-}
-.header {
-  height: 60px;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-}
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.header-left img { height: 28px; }
-.plan-badge {
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
-}
-.header-right {
-  display: flex;
-  gap: 12px;
-}
-.header-right button {
-  background: none;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: #2563eb;
-}
-.main {
-  max-width: 820px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-.card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-}
-button.generate {
-  width: 100%;
-  margin-top: 10px;
-  background: #111827;
-  color: white;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-}
-.result { margin-top: 30px; display: none; }
-.image-wrapper { position: relative; margin-top: 12px; }
-.image-wrapper img { width: 100%; border-radius: 12px; }
-.watermark {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.45);
-  color: #fff;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  display: none;
-  pointer-events: none;
-}
-.upgrade {
-  margin-top: 20px;
-  background: #eef2ff;
-  border: 1px dashed #6366f1;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-}
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #111827;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
+    /* HEADER */
+    .header {
+      height: 60px;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-left img {
+      height: 28px;
+    }
+
+    .plan-badge {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-right button {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #2563eb;
+    }
+
+    /* MAIN */
+    .main {
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: #6b7280;
+      margin-bottom: 30px;
+    }
+
+    /* FORM */
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #374151;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.95rem;
+    }
+
+    button.generate {
+      width: 100%;
+      margin-top: 10px;
+      background: #111827;
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* RESULT */
+    .result {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .result h2 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .result-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 15px;
+    }
+
+    /* IMAGE + WATERMARK */
+    .image-wrapper {
+      position: relative;
+      margin-top: 12px;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: none;
+      pointer-events: none;
+    }
+
+    /* UPGRADE */
+    .upgrade {
+      margin-top: 20px;
+      background: #eef2ff;
+      border: 1px dashed #6366f1;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .upgrade a {
+      color: #4f46e5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    /* FOOTER SPACE */
+    .footer-space {
+      height: 80px;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid #e5e7eb;
+      border-top: 3px solid #111827;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
-<body>
-
-<div class="header">
-  <div class="header-left">
-    <img src="assets/logo.png">
-    <div class="plan-badge" id="user-plan"></div>
-  </div>
-  <div class="header-right">
-    <button id="upgradeBtn">Upgrade</button>
-    <button id="logoutBtn">Sair</button>
-  </div>
-</div>
-
-<div class="main">
-
-  <div class="card">
-    <input id="niche" placeholder="Nicho">
-    <button class="generate" id="generateBtn">Gerar conteúdo com IA</button>
-    <div id="loadingBox" style="display:none; margin-top:20px;">
-      <div class="spinner"></div>
+<body> <!-- HEADER -->
+  <div class="header">
+    <div class="header-left"> <img src="assets/logo.png" alt="Lyvra">
+      <div class="plan-badge" id="user-plan"> Plano Free • <span id="usageCount">0</span> / <span
+          id="usageLimit">3</span> </div>
+    </div>
+    <div class="header-right"> <button id="upgradeBtn">Upgrade</button> <button id="logoutBtn">Sair</button> </div>
+  </div> <!-- MAIN -->
+  <div class="main">
+    <h1>Gerar conteúdo para Instagram</h1>
+    <p class="sub">Ideias, copy e imagem em segundos com IA</p>
+    <div class="card">
+      <div class="form-group"> <label>Nicho</label> <input type="text" id="niche"
+          placeholder="Ex: marketing digital, fitness, moda feminina"> </div>
+      <div class="form-group"> <label>Objetivo do post</label> <select id="goal">
+          <option value="engajamento">Engajamento</option>
+          <option value="vendas">Vendas</option>
+          <option value="autoridade">Autoridade</option>
+        </select> </div> <button class="generate" id="generateBtn">Gerar conteúdo com IA</button>
+      <div id="loadingBox" style="display:none; margin-top:20px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="spinner"></div> <span id="loadingText">Lyvra está criando seu conteúdo...</span>
+        </div>
+      </div>
+    </div> <!-- RESULT -->
+    <div class="result" id="result">
+      <h2>Resultado</h2>
+      <div class="result-box"> <strong>Ideia:</strong>
+        <p id="ideaText"></p>
+      </div>
+      <div class="result-box"> <strong>Legenda:</strong>
+        <p id="copyText"></p>
+      </div>
+      <div class="result-box"> <strong>Imagem:</strong>
+        <div class="image-wrapper"> <img id="imagePreview" />
+          <div class="watermark" id="watermark">Criado com Lyvra AI</div>
+        </div>
+      </div>
+      <div class="upgrade" id="upgradeBox"> Você está usando o plano Free. <a href="/planos.html">Desbloqueie mais
+          recursos no plano Pro</a> </div>
     </div>
   </div>
-
-  <div class="result" id="result">
-    <p id="ideaText"></p>
-    <p id="copyText"></p>
-
-    <div class="image-wrapper">
-      <img id="imagePreview">
-      <div class="watermark" id="watermark">Criado com Lyvra AI</div>
-    </div>
-
-    <div class="upgrade" id="upgradeBox">
-      Você está no plano Free —
-      <a href="/planos.html">fazer upgrade</a>
-    </div>
-  </div>
-
-</div>
-
+  <div class="footer-space"></div>
 <script>
-/* === UTIL === */
+/* ======================================================
+   UTIL
+====================================================== */
 function getPlanFromURL() {
-  return new URLSearchParams(window.location.search).get("plan");
+  const params = new URLSearchParams(window.location.search);
+  return params.get("plan");
 }
 
-/* === USUÁRIO === */
+/* ======================================================
+   ELEMENTOS
+====================================================== */
+const generateBtn   = document.getElementById("generateBtn");
+const loadingBox    = document.getElementById("loadingBox");
+const resultBox     = document.getElementById("result");
+const upgradeBox    = document.getElementById("upgradeBox");
+const watermarkEl   = document.getElementById("watermark");
+const userPlanEl    = document.getElementById("user-plan");
+
+/* ======================================================
+   USUÁRIO (UID ISOLADO)
+====================================================== */
 let uid = localStorage.getItem("lyvra_uid");
+
 if (!uid) {
-  uid = "uid_" + Math.random().toString(36).slice(2);
+  uid = "uid_" + crypto.randomUUID();
   localStorage.setItem("lyvra_uid", uid);
 }
 
-const planKey = `lyvra_plan_${uid}`;
+/* ======================================================
+   PLANO (POR USUÁRIO)
+====================================================== */
 const urlPlan = getPlanFromURL();
+const storedPlanKey = `lyvra_plan_${uid}`;
 
+let plan = localStorage.getItem(storedPlanKey) || "free";
+
+/* URL tem prioridade (ex: pós-checkout) */
 if (urlPlan) {
-  localStorage.setItem(planKey, urlPlan);
+  plan = urlPlan;
+  localStorage.setItem(storedPlanKey, plan);
 }
 
-const userPlan = localStorage.getItem(planKey) || "free";
+/* ======================================================
+   LIMITES POR PLANO
+====================================================== */
+const limits = {
+  free: 3,
+  pro: 300,
+  business: Infinity
+};
 
-/* === LIMITES === */
-const limits = { free: 3, pro: 300, business: Infinity };
-
+/* ======================================================
+   CONTADOR MENSAL POR USUÁRIO
+====================================================== */
 const now = new Date();
-const monthKey = `${now.getFullYear()}-${now.getMonth()+1}`;
+const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
 const usageKey = `lyvra_usage_${uid}_${monthKey}`;
+
 let usageCount = parseInt(localStorage.getItem(usageKey)) || 0;
+const usageLimit = limits[plan];
 
-/* === HEADER === */
-document.getElementById("user-plan").innerHTML =
-  `Plano ${userPlan.toUpperCase()} • ${usageCount} / ${limits[userPlan] === Infinity ? "∞" : limits[userPlan]}`;
+/* ======================================================
+   HEADER
+====================================================== */
+userPlanEl.innerHTML = `
+  Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} • 
+  <span id="usageCount">${usageCount}</span> / 
+  <span id="usageLimit">${usageLimit === Infinity ? "∞" : usageLimit}</span>
+`;
 
-/* === WATERMARK === */
-if (userPlan === "free") {
-  document.getElementById("watermark").style.display = "block";
+/* ======================================================
+   WATERMARK
+====================================================== */
+watermarkEl.style.display = plan === "free" ? "block" : "none";
+
+/* ======================================================
+   LIMITE
+====================================================== */
+function checkLimit() {
+  if (usageCount >= usageLimit) {
+    generateBtn.disabled = true;
+    generateBtn.innerText = "Limite atingido";
+
+    if (plan === "free") {
+      upgradeBox.style.display = "block";
+    }
+    return true;
+  }
+
+  generateBtn.disabled = false;
+  generateBtn.innerText = "Gerar conteúdo com IA";
+  upgradeBox.style.display = "none";
+  return false;
 }
 
-/* === GERAR === */
-document.getElementById("generateBtn").onclick = async () => {
-  if (usageCount >= limits[userPlan]) {
-    document.getElementById("upgradeBox").style.display = "block";
+checkLimit();
+
+/* ======================================================
+   GERAR CONTEÚDO (SIMULAÇÃO)
+====================================================== */
+generateBtn.addEventListener("click", async () => {
+  if (checkLimit()) return;
+
+  const niche = document.getElementById("niche").value.trim();
+  if (!niche) {
+    alert("Informe o nicho para gerar o conteúdo.");
     return;
   }
 
-  document.getElementById("loadingBox").style.display = "block";
-  await new Promise(r => setTimeout(r, 1500));
+  generateBtn.disabled = true;
+  generateBtn.innerText = "Gerando...";
+  loadingBox.style.display = "block";
+  resultBox.style.display = "none";
 
-  document.getElementById("ideaText").innerText = "Ideia gerada";
-  document.getElementById("copyText").innerText = "Legenda gerada";
+  /* Simulação – Make entra depois */
+  await new Promise(r => setTimeout(r, 2000));
+
+  document.getElementById("ideaText").innerText =
+    "3 erros comuns que estão impedindo seu Instagram de crescer";
+
+  document.getElementById("copyText").innerText =
+    "Você está postando, mas pequenos erros estão sabotando seu alcance. Veja como corrigir agora.";
+
   document.getElementById("imagePreview").src =
-    "https://via.placeholder.com/600x600";
+    "https://via.placeholder.com/600x600.png?text=Imagem+Gerada+pela+IA";
 
   usageCount++;
   localStorage.setItem(usageKey, usageCount);
 
-  location.reload();
-};
+  document.getElementById("usageCount").innerText = usageCount;
 
-/* === BOTÕES === */
-document.getElementById("logoutBtn").onclick = () => {
+  loadingBox.style.display = "none";
+  resultBox.style.display = "block";
+  generateBtn.disabled = false;
+  generateBtn.innerText = "Gerar conteúdo com IA";
+
+  resultBox.scrollIntoView({ behavior: "smooth" });
+
+  checkLimit();
+});
+
+/* ======================================================
+   BOTÕES SEMPRE FUNCIONAIS
+====================================================== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("lyvra_uid");
   window.location.href = "/index.html";
-};
+});
 
-document.getElementById("upgradeBtn").onclick = () => {
+document.getElementById("upgradeBtn").addEventListener("click", () => {
   window.location.href = "/planos.html";
-};
+});
 </script>
-
 </body>
 </html>
