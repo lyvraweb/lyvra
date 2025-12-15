@@ -163,61 +163,35 @@
   </div>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-/* ===== FIREBASE INIT (SAFE) ===== */
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "lyvra-e48a0.firebaseapp.com",
-  projectId: "lyvra-e48a0"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
-/* ===== PROTEÇÃO DE ROTA (SEM LOOP) ===== */
-auth.onAuthStateChanged(async (user) => {
-
-  if (!user) {
-    window.location.replace("/login.html");
-    return;
-  }
-
-  // A PARTIR DAQUI, USUÁRIO ESTÁ AUTENTICADO
-  const uid = user.uid;
-
-  const ref = db.collection("users").doc(uid);
-  const snap = await ref.get();
-
-  let plan = "free";
-
-  if (snap.exists) {
-    plan = snap.data().plan || "free";
-  } else {
-    await ref.set({ plan: "free" });
-  }
-
-  startApp(uid, plan);
-});
-
-/* ===== APP ===== */
-function startApp(uid, plan) {
-
-  document.getElementById("user-plan").innerText =
-    `Plano ${plan.toUpperCase()}`;
-
-  document.getElementById("logoutBtn").onclick = async () => {
-    await auth.signOut();
-    window.location.replace("/login.html");
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0"
   };
-}
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Proteção do app
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.replace("/login.html");
+      return;
+    }
+
+    // Usuário autenticado
+    console.log("Usuário logado:", user.email);
+  });
+
+  // Logout
+  document.getElementById("logoutBtn").onclick = () => {
+    auth.signOut();
+  };
 </script>
 </body>
 </html>
