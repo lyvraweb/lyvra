@@ -172,71 +172,111 @@ firebase.initializeApp({
 });
 
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db   = firebase.firestore();
 
 /* ================= LIMITES ================= */
-const limits = { free: 3, pro: 300, business: Infinity };
+const limits = {
+  free: 3,
+  pro: 300,
+  business: Infinity
+};
 
-/* ================= AUTH ================= */
+/* ================= AUTH GUARD (CORRETO) ================= */
+let appInitialized = false;
+
 auth.onAuthStateChanged(async (user) => {
 
-  // Aguarda o Firebase restaurar a sessão
-  if (user === null) {
-    setTimeout(() => {
-      if (!auth.currentUser) {
-        window.location.href = "/login.html";
-      }
-    }, 800);
+  // Firebase ainda inicializando
+  if (user === undefined) return;
+
+  // Não logado → login
+  if (!user) {
+    window.location.replace("/login.html");
     return;
   }
 
+  // Evita múltiplas execuções
+  if (appInitialized) return;
+  appInitialized = true;
+
   const uid = user.uid;
-  const ref = db.collection("users").doc(uid);
-  const snap = await ref.get();
+
+  /* ================= PLANO REAL (Firestore) ================= */
+  const userRef = db.collection("users").doc(uid);
+  const snap = await userRef.get();
 
   let plan = "free";
 
   if (snap.exists) {
     plan = snap.data().plan || "free";
   } else {
-    await ref.set({ plan: "free" });
+    await userRef.set({
+      plan: "free",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
   }
 
   initApp(uid, plan);
 });
 
+/* ================= APP ================= */
 function initApp(uid, plan) {
-  const usageKey = `usage_${uid}_${new Date().getMonth()}`;
+
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+  const usageKey = `lyvra_usage_${uid}_${monthKey}`;
+
   let used = parseInt(localStorage.getItem(usageKey)) || 0;
   const limit = limits[plan];
 
-  document.getElementById("user-plan").innerText =
-    `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+  const userPlanEl  = document.getElementById("user-plan");
+  const watermark  = document.getElementById("watermark");
+  const resultBox  = document.getElementById("result");
+  const upgradeBox = document.getElementById("upgradeBox");
+  const generateBtn = document.getElementById("generateBtn");
 
-  document.getElementById("watermark").style.display =
-    plan === "free" ? "block" : "none";
+  function updateHeader() {
+    userPlanEl.innerText =
+      `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+  }
 
-  document.getElementById("generateBtn").onclick = () => {
-    if (used >= limit) return;
+  updateHeader();
+
+  watermark.style.display = plan === "free" ? "block" : "none";
+
+  generateBtn.onclick = () => {
+
+    if (used >= limit) {
+      if (plan === "free") upgradeBox.style.display = "block";
+      return;
+    }
 
     used++;
     localStorage.setItem(usageKey, used);
 
-    document.getElementById("ideaText").innerText = "Ideia gerada com IA";
-    document.getElementById("copyText").innerText = "Legenda persuasiva";
+    document.getElementById("ideaText").innerText =
+      "Ideia gerada com IA";
+
+    document.getElementById("copyText").innerText =
+      "Legenda persuasiva criada automaticamente.";
+
     document.getElementById("imagePreview").src =
       "https://via.placeholder.com/600";
 
-    document.getElementById("result").style.display = "block";
-    document.getElementById("user-plan").innerText =
-      `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+    resultBox.style.display = "block";
+    updateHeader();
   };
 }
 
 /* ================= BOTÕES ================= */
-document.getElementById("logoutBtn").onclick = () => auth.signOut();
-document.getElementById("upgradeBtn").onclick = () => location.href = "/planos.html";
-</script>
+document.getElementById("logoutBtn").onclick = async () => {
+  await auth.signOut();
+  window.location.replace("/login.html");
+};
 
+document.getElementById("upgradeBtn").onclick = () => {
+  window.location.href = "/planos.html";
+};
+</script>
 </body>
 </html>
