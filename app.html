@@ -14,73 +14,73 @@
 <p id="status">Carregando...</p>
 <button id="logout">Sair</button>
 <script>
-/* ================= FIREBASE ================= */
-firebase.initializeApp({
-  apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-  authDomain: "lyvra-e48a0.firebaseapp.com",
-  projectId: "lyvra-e48a0"
-});
+document.addEventListener("DOMContentLoaded", () => {
 
-const auth = firebase.auth();
-const db   = firebase.firestore();
+  /* ================= FIREBASE ================= */
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0"
+  };
 
-/* ================= ELEMENTOS ================= */
-const statusEl = document.getElementById("user-plan");
-const logoutBtn = document.getElementById("logoutBtn");
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
 
-/* ================= AUTH ================= */
-auth.onAuthStateChanged(async (user) => {
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
 
-  if (!user) {
-    window.location.replace("/login.html");
+  /* ================= ELEMENTOS ================= */
+  const statusEl  = document.getElementById("user-plan");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!statusEl || !logoutBtn) {
+    console.error("Elementos do DOM não encontrados");
     return;
   }
 
-  try {
-    const uid = user.uid;
-    const userRef = db.collection("users").doc(uid);
-    const snap = await userRef.get();
+  /* ================= AUTH ================= */
+  auth.onAuthStateChanged(async (user) => {
 
-    let data;
-
-    if (!snap.exists) {
-      data = {
-        email: user.email,
-        name: user.displayName || "",
-        plan: "free",
-        usageCount: 0,
-        usageMonth: getCurrentMonth(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      await userRef.set(data);
-    } else {
-      data = snap.data();
+    if (!user) {
+      window.location.replace("/login.html");
+      return;
     }
 
-    initApp(data);
+    try {
+      const uid = user.uid;
+      const ref = db.collection("users").doc(uid);
+      const snap = await ref.get();
 
-  } catch (err) {
-    console.error("Erro ao carregar usuário:", err);
-    statusEl.innerText = "Erro ao carregar conta";
-  }
+      let data;
+
+      if (!snap.exists) {
+        data = {
+          email: user.email,
+          name: user.displayName || "",
+          plan: "free",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await ref.set(data);
+      } else {
+        data = snap.data();
+      }
+
+      statusEl.innerText = `Plano ${data.plan.toUpperCase()}`;
+
+    } catch (err) {
+      console.error("Erro Firestore:", err);
+      statusEl.innerText = "Erro ao carregar conta";
+    }
+  });
+
+  /* ================= LOGOUT ================= */
+  logoutBtn.addEventListener("click", async () => {
+    await auth.signOut();
+    window.location.replace("/login.html");
+  });
+
 });
-
-/* ================= APP ================= */
-function initApp(user) {
-  statusEl.innerText = `Plano ${user.plan.toUpperCase()}`;
-}
-
-/* ================= LOGOUT ================= */
-logoutBtn.addEventListener("click", async () => {
-  await auth.signOut();
-  window.location.replace("/login.html");
-});
-
-/* ================= UTILS ================= */
-function getCurrentMonth() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
 </script>
 </body>
 </html>
