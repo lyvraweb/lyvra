@@ -17,68 +17,75 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= FIREBASE ================= */
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+  firebase.initializeApp({
+    apiKey: "SUA_API_KEY",
     authDomain: "lyvra-e48a0.firebaseapp.com",
     projectId: "lyvra-e48a0"
-  };
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  });
 
   const auth = firebase.auth();
-  const db   = firebase.firestore();
+  const db = firebase.firestore();
 
-  /* ================= ELEMENTOS ================= */
-  const statusEl  = document.getElementById("user-plan");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  if (!statusEl || !logoutBtn) {
-    console.error("Elementos do DOM não encontrados");
-    return;
-  }
+  /* ================= LIMITES ================= */
+  const limits = { free: 3, pro: 300, business: Infinity };
 
   /* ================= AUTH ================= */
   auth.onAuthStateChanged(async (user) => {
 
     if (!user) {
-      window.location.replace("/login.html");
+      window.location.href = "/login.html";
       return;
     }
 
-    try {
-      const uid = user.uid;
-      const ref = db.collection("users").doc(uid);
-      const snap = await ref.get();
+    const uid = user.uid;
+    const ref = db.collection("users").doc(uid);
+    const snap = await ref.get();
 
-      let data;
+    let plan = "free";
 
-      if (!snap.exists) {
-        data = {
-          email: user.email,
-          name: user.displayName || "",
-          plan: "free",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        await ref.set(data);
-      } else {
-        data = snap.data();
-      }
-
-      statusEl.innerText = `Plano ${data.plan.toUpperCase()}`;
-
-    } catch (err) {
-      console.error("Erro Firestore:", err);
-      statusEl.innerText = "Erro ao carregar conta";
+    if (snap.exists) {
+      plan = snap.data().plan || "free";
+    } else {
+      await ref.set({ plan: "free" });
     }
+
+    initApp(uid, plan);
   });
 
-  /* ================= LOGOUT ================= */
-  logoutBtn.addEventListener("click", async () => {
-    await auth.signOut();
-    window.location.replace("/login.html");
-  });
+  function initApp(uid, plan) {
+    const usageKey = `usage_${uid}_${new Date().getMonth()}`;
+    let used = parseInt(localStorage.getItem(usageKey)) || 0;
+    const limit = limits[plan];
+
+    const userPlanEl = document.getElementById("user-plan");
+    const watermark = document.getElementById("watermark");
+    const result = document.getElementById("result");
+
+    userPlanEl.innerText =
+      `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+
+    watermark.style.display = plan === "free" ? "block" : "none";
+
+    document.getElementById("generateBtn").onclick = () => {
+      if (used >= limit) return;
+
+      used++;
+      localStorage.setItem(usageKey, used);
+
+      document.getElementById("ideaText").innerText = "Ideia gerada com IA";
+      document.getElementById("copyText").innerText = "Legenda persuasiva";
+      document.getElementById("imagePreview").src =
+        "https://via.placeholder.com/600";
+
+      result.style.display = "block";
+      userPlanEl.innerText =
+        `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+    };
+  }
+
+  /* ================= BOTÕES ================= */
+  document.getElementById("logoutBtn").onclick = () => auth.signOut();
+  document.getElementById("upgradeBtn").onclick = () => location.href = "/planos.html";
 
 });
 </script>
