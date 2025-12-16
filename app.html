@@ -13,40 +13,61 @@
 <h1>Bem-vindo ao Lyvra</h1>
 <p id="status">Carregando...</p>
 <button id="logout">Sair</button>
-
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-    authDomain: "lyvra-e48a0.firebaseapp.com",
-    projectId: "lyvra-e48a0"
-  };
+/* ================= FIREBASE ================= */
+firebase.initializeApp({
+  apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+  authDomain: "lyvra-e48a0.firebaseapp.com",
+  projectId: "lyvra-e48a0"
+});
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) {
-      window.location.replace("/login.html");
-      return;
-    }
+/* ================= AUTH ================= */
+auth.onAuthStateChanged(async (user) => {
 
-    document.getElementById("status").innerText =
-      "Logado como: " + user.email;
-
-    const ref = db.collection("users").doc(user.uid);
-    const snap = await ref.get();
-
-    if (!snap.exists) {
-      await ref.set({ plan: "free" });
-    }
-  });
-
-  document.getElementById("logout").onclick = async () => {
-    await auth.signOut();
+  if (!user) {
     window.location.href = "/login.html";
-  };
-</script>
+    return;
+  }
 
+  const uid = user.uid;
+  const userRef = db.collection("users").doc(uid);
+  const snap = await userRef.get();
+
+  let userData;
+
+  if (!snap.exists) {
+    userData = {
+      email: user.email,
+      name: user.displayName || "",
+      plan: "free",
+      usageCount: 0,
+      usageMonth: getCurrentMonth(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await userRef.set(userData);
+  } else {
+    userData = snap.data();
+  }
+
+  initApp(userData);
+});
+
+/* ================= APP ================= */
+function initApp(user) {
+  document.getElementById("user-plan").innerText =
+    `Plano ${user.plan.toUpperCase()}`;
+
+  console.log("Usuário carregado:", user);
+}
+
+/* ================= UTILS ================= */
+function getCurrentMonth() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+</script>
 </body>
 </html>
