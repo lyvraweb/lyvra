@@ -12,6 +12,7 @@
 
 <h1>Bem-vindo ao Lyvra</h1>
 <p id="user-plan">Carregando...</p>
+<button id="upgradeBtn">Upgrade</button>
 <button id="logoutBtn">Sair</button>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -85,8 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= BOTÕES ================= */
   document.getElementById("logoutBtn").onclick = () => auth.signOut();
-  document.getElementById("upgradeBtn").onclick = () => location.href = "/planos.html";
+  document.getElementById("upgradeBtn").onclick = async () => {
+  const user = auth.currentUser;
+  if (!user) return;
 
+  // Mantém a sessão, só navega
+  window.location.href = `/planos.html`;
+};
 });
 </script>
 </body>
