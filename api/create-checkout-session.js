@@ -45,6 +45,9 @@ export default async function handler(req, res) {
         }
       ],
 
+      // 🔑 liga a sessão ao usuário real
+      client_reference_id: uid,
+
       customer_email: email || undefined,
 
       metadata: {
