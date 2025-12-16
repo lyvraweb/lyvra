@@ -1,272 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/png" href="assets/favicon.png">
-<title>Lyvra - Planos e Preços</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Planos — Lyvra</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f9ff;
-  color: #0a1a2a;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  padding: 16px 24px;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-header img {
-  height: 48px;
-}
-
-.container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-
-h1 {
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  margin-bottom: 10px;
-  color: #083b8c;
-  text-align: center;
-}
-
-p.sub {
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
-  margin-bottom: 40px;
-  color: #0a1a2acc;
-  text-align: center;
-}
-
-/* PLANOS */
-.plans {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-}
-
-.plan {
-  background: white;
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  border: 2px solid #e2eaff;
-  transition: 0.3s;
-}
-
-.plan:hover {
-  transform: translateY(-5px);
-  border-color: #3b82f6;
-}
-
-.plan.popular {
-  border-color: #0055ff;
-  box-shadow: 0 8px 30px rgba(0,85,255,0.2);
-}
-
-.badge-popular {
-  display: inline-block;
-  background: #0055ff;
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  margin-bottom: 10px;
-}
-
-.plan h2 {
-  font-size: 1.5rem;
-}
-
-.price {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 16px 0;
-  color: #0055ff;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 24px;
-}
-
-ul li {
-  margin: 10px 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-a.button {
-  display: block;
-  width: 100%;
-  background: linear-gradient(90deg, #4f3cff, #638bff);
-  color: white;
-  padding: 14px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 1.05rem;
-  text-align: center;
-}
-
-/* COMPARAÇÃO */
-.comparison {
-  margin-top: 80px;
-}
-
-.comparison h2 {
-  text-align: center;
-  font-size: clamp(1.6rem, 4vw, 2rem);
-  color: #083b8c;
-  margin-bottom: 20px;
-}
-
-/* TABELA DESKTOP */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-th, td {
-  padding: 16px;
-  text-align: center;
-  border-bottom: 1px solid #eaeaea;
-}
-
-th {
-  background: #f0f4ff;
-  color: #083b8c;
-}
-
-/* MOBILE TABLE → CARDS */
-@media (max-width: 768px) {
-  table {
-    display: none;
-  }
-
-  .mobile-comparison {
-    display: grid;
-    gap: 20px;
-  }
-
-  .mobile-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  }
-
-  .mobile-card h3 {
-    color: #0055ff;
-    margin-bottom: 12px;
-  }
-
-  .mobile-card p {
-    font-size: 0.95rem;
-    margin: 6px 0;
-  }
-}
-
-/* FOOTER */
-footer {
-  background: #ffffff;
-  border-top: 1px solid #e6e6e6;
-  padding: 40px 20px;
-  margin-top: 80px;
-  text-align: center;
-}
-
-footer img {
-  height: 42px;
-  margin-bottom: 12px;
-}
-
-footer p {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-</style>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f7f7f8;
+      margin: 0;
+      padding: 40px;
+      color: #111827;
+    }
+    .box {
+      max-width: 420px;
+      margin: auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+    h1 { margin-bottom: 10px; }
+    .plan {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .plan.pro {
+      border-color: #4f46e5;
+      background: #eef2ff;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn-free {
+      background: #e5e7eb;
+      color: #111827;
+      cursor: default;
+    }
+    .btn-pro {
+      background: #4f46e5;
+      color: #fff;
+    }
+    .status {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      color: #059669;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <img src="assets/logo.png" alt="Lyvra">
-</header>
+<div class="box">
+  <h1>Escolha seu plano</h1>
+  <p id="loading">Carregando informações...</p>
 
-<div class="container">
-  <h1>Escolha o plano ideal para você</h1>
-  <p class="sub">Comece grátis e evolua com recursos profissionais</p>
+  <div class="plan" id="plan-free" style="display:none">
+    <h3>Plano Free</h3>
+    <p>3 gerações por mês</p>
+    <button class="btn-free">Plano atual</button>
+  </div>
 
-  <div class="plans">
-
-    <div class="plan">
-      <h2>Free</h2>
-      <p class="price">$0</p>
-      <ul>
-        <li>10 ideias de conteúdo/dia</li>
-        <li>1 post diário com marca d’água</li>
-        <li>Calendário IA básico</li>
-        <li>10 gerações/mês</li>
-      </ul>
-      <a href="/login.html?redirect=/app.html&plan=free" class="button">Começar grátis</a>
-    </div>
-
-    <div class="plan popular">
-      <span class="badge-popular">Mais Popular</span>
-      <h2>Pro</h2>
-      <p class="price">$5,99</p>
-      <ul>
-        <li>300 gerações/mês</li>
-        <li>Posts e carrosséis HD</li>
-        <li>Anúncios e scripts</li>
-        <li>Sem marca d’água</li>
-      </ul>
-      <a href="/checkout.html?plan=pro" class="button">Assinar Pro</a>
-    </div>
-
-    <div class="plan">
-      <h2>Business</h2>
-      <p class="price">$12,99</p>
-      <ul>
-        <li>Gerações ilimitadas</li>
-        <li>Automação total com IA</li>
-        <li>Modo agência</li>
-        <li>Prioridade máxima</li>
-      </ul>
-      <a href="checkout.html?plan=business" class="button">Assinar Business</a>
-    </div>
-
+  <div class="plan pro" id="plan-pro" style="display:none">
+    <h3>Plano Pro</h3>
+    <p>300 gerações por mês</p>
+    <button class="btn-pro" id="btnUpgrade">Fazer upgrade</button>
+    <div class="status" id="proStatus" style="display:none">Você já é Pro</div>
   </div>
 </div>
 
-<footer>
-  <img src="assets/logo.png" alt="Lyvra">
-  <p>Transcendendo os Limites da Criatividade Humana</p>
-  <p>© 2025 Lyvra. Todos os direitos reservados.</p>
-</footer>
 <script>
-const uidFromURL = new URLSearchParams(window.location.search).get("uid");
+/* ================= FIREBASE ================= */
+firebase.initializeApp({
+  apiKey: "SUA_API_KEY",
+  authDomain: "lyvra-e48a0.firebaseapp.com",
+  projectId: "lyvra-e48a0"
+});
 
-if (uidFromURL) {
-  localStorage.setItem("lyvra_uid", uidFromURL);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ================= AUTH ================= */
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "/login.html?redirect=/planos.html";
+    return;
+  }
+
+  const uid = user.uid;
+  const ref = db.collection("users").doc(uid);
+  const snap = await ref.get();
+
+  let plan = "free";
+
+  if (snap.exists) {
+    plan = snap.data().plan || "free";
+  } else {
+    await ref.set({ plan: "free" });
+  }
+
+  renderPlans(plan, uid);
+});
+
+function renderPlans(plan, uid) {
+  document.getElementById("loading").style.display = "none";
+
+  document.getElementById("plan-free").style.display = "block";
+  document.getElementById("plan-pro").style.display = "block";
+
+  if (plan === "pro") {
+    document.getElementById("btnUpgrade").style.display = "none";
+    document.getElementById("proStatus").style.display = "block";
+  }
+
+  document.getElementById("btnUpgrade").onclick = async () => {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan: "pro",
+        uid,
+        email: auth.currentUser.email
+      })
+    });
+
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert("Erro ao iniciar pagamento");
+  };
 }
 </script>
+
 </body>
 </html>
