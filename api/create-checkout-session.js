@@ -32,6 +32,7 @@ export default async function handler(req, res) {
 
     /* ===============================
        CHECKOUT STRIPE
+       (VERSÃO CORRETA PARA SAAS)
     =============================== */
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -45,14 +46,18 @@ export default async function handler(req, res) {
         }
       ],
 
-      // 🔑 liga a sessão ao usuário real
+      // Referência interna (opcional, mas bom manter)
       client_reference_id: uid,
 
+      // Email do cliente
       customer_email: email || undefined,
 
-      metadata: {
-        uid,
-        plan
+      // 🔴 METADATA DA ASSINATURA (OBRIGATÓRIO)
+      subscription_data: {
+        metadata: {
+          uid,
+          plan
+        }
       },
 
       success_url: `${process.env.APP_URL}/app.html?checkout=success`,
