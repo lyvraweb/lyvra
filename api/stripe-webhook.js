@@ -72,3 +72,35 @@ export default async function handler(req, res) {
 
   res.status(200).json({ received: true });
 }
+
+// Assinatura atualizada (downgrade ou cancelamento programado)
+if (event.type === "customer.subscription.updated") {
+  const sub = event.data.object;
+  const uid = sub.metadata?.uid;
+
+  if (uid && sub.cancel_at_period_end) {
+    await db.collection("users").doc(uid).set(
+      {
+        plan: "free",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+  }
+}
+
+// Assinatura cancelada definitivamente
+if (event.type === "customer.subscription.deleted") {
+  const sub = event.data.object;
+  const uid = sub.metadata?.uid;
+
+  if (uid) {
+    await db.collection("users").doc(uid).set(
+      {
+        plan: "free",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+  }
+}
