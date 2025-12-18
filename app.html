@@ -12,7 +12,7 @@
 
 <h1>Bem-vindo ao Lyvra</h1>
 <p id="user-plan">Carregando...</p>
-<button id="upgradeBtn">Upgrade</button>
+<div class="upgrade" id="upgradeBox" style="display:none;">
 <button id="logoutBtn">Sair</button>
 <script>
 /* ================= FIREBASE ================= */
@@ -90,8 +90,11 @@ function applyPlanUI(uid, plan) {
 
   // Watermark e Upgrade
   watermarkEl.style.display = plan === "free" ? "block" : "none";
-  upgradeBox.style.display  = plan === "free" ? "block" : "none";
-
+  if (plan === "free") {
+  upgradeBox.style.display = "block";
+} else {
+  upgradeBox.style.display = "none";
+}
   updateGenerateButton();
 }
 
