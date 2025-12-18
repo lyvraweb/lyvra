@@ -17,6 +17,7 @@
 
 <button id="generateBtn">Gerar conteúdo</button>
 <button id="upgradeBtn">Upgrade</button>
+<button id="managePlanBtn" style="display:none;">Gerenciar assinatura</button>
 <button id="logoutBtn">Sair</button>
 
 <div id="result" style="display:none;">
@@ -110,6 +111,25 @@ function applyPlanUI(uid, plan) {
 upgradeBox.style.display  = isFree ? "block" : "none";
 upgradeBtn.style.display  = isFree ? "inline-block" : "none";
 
+  const manageBtn = document.getElementById("managePlanBtn");
+
+if (plan === "free") {
+  manageBtn.style.display = "none";
+} else {
+  manageBtn.style.display = "inline-block";
+}
+manageBtn.onclick = async () => {
+  const res = await fetch("/api/create-portal-session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uid: CURRENT_UID })
+  });
+
+  const data = await res.json();
+  if (data.url) {
+    window.location.href = data.url;
+  }
+};
 
   updateGenerateButton();
 }
