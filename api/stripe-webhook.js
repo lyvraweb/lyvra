@@ -2,6 +2,12 @@ import Stripe from "stripe";
 import admin from "firebase-admin";
 import { buffer } from "micro";
 
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 if (!admin.apps.length) {
@@ -13,8 +19,6 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-
-export const config = { api: { bodyParser: false } };
 
 export default async function handler(req, res) {
   const sig = req.headers["stripe-signature"];
@@ -29,32 +33,48 @@ export default async function handler(req, res) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
+    console.error("Webhook signature error:", err.message);
     return res.status(400).send("Webhook Error");
   }
 
+  /* ================= CHECKOUT CONCLUÍDO ================= */
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    const sub = await stripe.subscriptions.retrieve(session.subscription);
 
-    const { uid, plan } = sub.metadata;
-
-    await db.collection("users").doc(uid).set(
-      {
-        plan,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      },
-      { merge: true }
+    const subscription = await stripe.subscriptions.retrieve(
+      session.subscription
     );
+
+    const uid = subscription.metadata.uid;
+    const plan = subscription.metadata.plan;
+
+    if (uid && plan) {
+      await db.collection("users").doc(uid).set(
+        {
+          plan,
+          stripeCustomerId: session.customer,
+          stripeSubscriptionId: subscription.id,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
   }
 
+  /* ================= CANCELAMENTO ================= */
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object;
     const uid = sub.metadata.uid;
 
-    await db.collection("users").doc(uid).set(
-      { plan: "free" },
-      { merge: true }
-    );
+    if (uid) {
+      await db.collection("users").doc(uid).set(
+        {
+          plan: "free",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
   }
 
   res.json({ received: true });
