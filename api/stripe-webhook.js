@@ -21,6 +21,8 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 export default async function handler(req, res) {
+  console.log("🔥 WEBHOOK RECEBIDO");
+  
   const sig = req.headers["stripe-signature"];
   const buf = await buffer(req);
 
@@ -36,6 +38,8 @@ export default async function handler(req, res) {
     console.error("Webhook signature error:", err.message);
     return res.status(400).send("Webhook Error");
   }
+  console.log("EVENT TYPE:", event.type);
+
 
   /* ================= CHECKOUT CONCLUÍDO ================= */
   if (event.type === "checkout.session.completed") {
