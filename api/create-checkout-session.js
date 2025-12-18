@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     }
 
     /* ===============================
-       MAPA DE PREÇOS
+       MAPA DE PREÇOS (STRIPE)
     =============================== */
     const priceMap = {
       pro: process.env.STRIPE_PRICE_PRO,
@@ -31,8 +31,7 @@ export default async function handler(req, res) {
     }
 
     /* ===============================
-       CHECKOUT STRIPE
-       (VERSÃO CORRETA PARA SAAS)
+       STRIPE CHECKOUT (SAAS CORRETO)
     =============================== */
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -46,13 +45,19 @@ export default async function handler(req, res) {
         }
       ],
 
-      // Referência interna (opcional, mas bom manter)
+      // 🔗 Referência interna (bom para auditoria)
       client_reference_id: uid,
 
-      // Email do cliente
+      // 📧 Email do cliente
       customer_email: email || undefined,
 
-      // 🔴 METADATA DA ASSINATURA (OBRIGATÓRIO)
+      // 🔥 METADATA DA SESSÃO (opcional, mas útil)
+      metadata: {
+        uid,
+        plan
+      },
+
+      // 🔑 METADATA DA ASSINATURA (OBRIGATÓRIO)
       subscription_data: {
         metadata: {
           uid,
