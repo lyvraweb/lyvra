@@ -23,7 +23,7 @@ firebase.initializeApp({
 });
 
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db   = firebase.firestore();
 
 /* ================= LIMITES ================= */
 const limits = {
@@ -37,6 +37,14 @@ const userPlanEl  = document.getElementById("user-plan");
 const watermarkEl = document.getElementById("watermark");
 const upgradeBox  = document.getElementById("upgradeBox");
 const generateBtn = document.getElementById("generateBtn");
+const resultBox   = document.getElementById("result");
+
+/* ================= ESTADO GLOBAL ================= */
+let CURRENT_PLAN = "free";
+let CURRENT_UID  = null;
+let USED         = 0;
+let LIMIT        = 0;
+let USAGE_KEY    = null;
 
 /* ================= AUTH ================= */
 auth.onAuthStateChanged((user) => {
@@ -45,11 +53,11 @@ auth.onAuthStateChanged((user) => {
     return;
   }
 
-  const uid = user.uid;
-  listenUserPlan(uid);
+  CURRENT_UID = user.uid;
+  listenUserPlan(CURRENT_UID);
 });
 
-/* ================= OUVINTE DO PLANO ================= */
+/* ================= ESCUTA PLANO EM TEMPO REAL ================= */
 function listenUserPlan(uid) {
   const ref = db.collection("users").doc(uid);
 
@@ -68,38 +76,65 @@ function listenUserPlan(uid) {
 
 /* ================= APLICA UI ================= */
 function applyPlanUI(uid, plan) {
-  const monthKey = new Date().toISOString().slice(0,7);
-  const usageKey = `usage_${uid}_${monthKey}`;
+  CURRENT_PLAN = plan;
+  LIMIT = limits[plan];
 
-  let used = parseInt(localStorage.getItem(usageKey)) || 0;
-  const limit = limits[plan];
+  const monthKey = new Date().toISOString().slice(0, 7);
+  USAGE_KEY = `usage_${uid}_${monthKey}`;
 
+  USED = parseInt(localStorage.getItem(USAGE_KEY)) || 0;
+
+  // Header
   userPlanEl.innerText =
-    `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
+    `Plano ${plan.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
 
+  // Watermark e Upgrade
   watermarkEl.style.display = plan === "free" ? "block" : "none";
   upgradeBox.style.display  = plan === "free" ? "block" : "none";
 
-  generateBtn.onclick = () => {
-    if (used >= limit) return;
+  updateGenerateButton();
+}
 
-    used++;
-    localStorage.setItem(usageKey, used);
+/* ================= BOTÃO GERAR ================= */
+generateBtn.addEventListener("click", () => {
+  if (USED >= LIMIT) return;
 
-    document.getElementById("ideaText").innerText = "Ideia gerada com IA";
-    document.getElementById("copyText").innerText = "Legenda persuasiva";
-    document.getElementById("imagePreview").src =
-      "https://via.placeholder.com/600";
+  USED++;
+  localStorage.setItem(USAGE_KEY, USED);
 
-    document.getElementById("result").style.display = "block";
-    userPlanEl.innerText =
-      `Plano ${plan.toUpperCase()} • ${used}/${limit === Infinity ? "∞" : limit}`;
-  };
+  document.getElementById("ideaText").innerText = "Ideia gerada com IA";
+  document.getElementById("copyText").innerText = "Legenda persuasiva";
+  document.getElementById("imagePreview").src =
+    "https://via.placeholder.com/600";
+
+  resultBox.style.display = "block";
+
+  userPlanEl.innerText =
+    `Plano ${CURRENT_PLAN.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
+
+  updateGenerateButton();
+});
+
+/* ================= CONTROLE DO BOTÃO ================= */
+function updateGenerateButton() {
+  if (USED >= LIMIT) {
+    generateBtn.disabled = true;
+    generateBtn.innerText = "Limite atingido";
+  } else {
+    generateBtn.disabled = false;
+    generateBtn.innerText = "Gerar conteúdo";
+  }
 }
 
 /* ================= BOTÕES ================= */
-document.getElementById("logoutBtn").onclick = () => auth.signOut();
-document.getElementById("upgradeBtn").onclick = () => location.href = "/planos.html";
+document.getElementById("logoutBtn").onclick = async () => {
+  await auth.signOut();
+  window.location.replace("/login.html");
+};
+
+document.getElementById("upgradeBtn").onclick = () => {
+  window.location.href = "/planos.html";
+};
 </script>
 </body>
 </html>
