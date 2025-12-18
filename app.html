@@ -52,6 +52,7 @@ const limits = {
 const userPlanEl  = document.getElementById("user-plan");
 const watermarkEl = document.getElementById("watermark");
 const upgradeBox  = document.getElementById("upgradeBox");
+const upgradeBtn = document.getElementById("upgradeBtn");
 const generateBtn = document.getElementById("generateBtn");
 const resultBox   = document.getElementById("result");
 
@@ -104,7 +105,11 @@ function applyPlanUI(uid, plan) {
     `Plano ${plan.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
 
   watermarkEl.style.display = plan === "free" ? "block" : "none";
-  upgradeBox.style.display  = plan === "free" ? "block" : "none";
+  const isFree = plan === "free";
+
+upgradeBox.style.display  = isFree ? "block" : "none";
+upgradeBtn.style.display  = isFree ? "inline-block" : "none";
+
 
   updateGenerateButton();
 }
