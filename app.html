@@ -32,149 +32,134 @@
 </div>
 
 <script>
-/* ================= FIREBASE ================= */
-firebase.initializeApp({
-  apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
-  authDomain: "lyvra-e48a0.firebaseapp.com",
-  projectId: "lyvra-e48a0"
-});
+document.addEventListener("DOMContentLoaded", () => {
 
-const auth = firebase.auth();
-const db   = firebase.firestore();
+  /* ================= FIREBASE ================= */
+  firebase.initializeApp({
+    apiKey: "AIzaSyBzFp2tWWFzXD1bfEJ3TmtdnYTnXgphENc",
+    authDomain: "lyvra-e48a0.firebaseapp.com",
+    projectId: "lyvra-e48a0"
+  });
 
-/* ================= LIMITES ================= */
-const limits = {
-  free: 3,
-  pro: 300,
-  business: Infinity
-};
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
 
-/* ================= ELEMENTOS ================= */
-const userPlanEl  = document.getElementById("user-plan");
-const watermarkEl = document.getElementById("watermark");
-const upgradeBox  = document.getElementById("upgradeBox");
-const upgradeBtn = document.getElementById("upgradeBtn");
-const generateBtn = document.getElementById("generateBtn");
-const resultBox   = document.getElementById("result");
+  /* ================= LIMITES ================= */
+  const limits = {
+    free: 3,
+    pro: 300,
+    business: Infinity
+  };
 
-/* ================= ESTADO ================= */
-let CURRENT_PLAN = "free";
-let CURRENT_UID  = null;
-let USED         = 0;
-let LIMIT        = 0;
-let USAGE_KEY    = null;
+  /* ================= ELEMENTOS ================= */
+  const userPlanEl   = document.getElementById("user-plan");
+  const watermarkEl  = document.getElementById("watermark");
+  const upgradeBox   = document.getElementById("upgradeBox");
+  const upgradeBtn   = document.getElementById("upgradeBtn");
+  const manageBtn    = document.getElementById("managePlanBtn");
+  const generateBtn  = document.getElementById("generateBtn");
+  const resultBox    = document.getElementById("result");
 
-/* ================= AUTH ================= */
-auth.onAuthStateChanged((user) => {
-  if (!user) {
-    window.location.replace("/login.html");
-    return;
-  }
+  /* ================= ESTADO GLOBAL ================= */
+  let UID = null;
+  let PLAN = "free";
+  let USED = 0;
+  let LIMIT = limits.free;
+  let USAGE_KEY = null;
 
-  CURRENT_UID = user.uid;
-  listenUserPlan(CURRENT_UID);
-});
-
-/* ================= ESCUTA PLANO (REALTIME) ================= */
-function listenUserPlan(uid) {
-  const ref = db.collection("users").doc(uid);
-
-  ref.onSnapshot(async (doc) => {
-    let plan = "free";
-
-    if (doc.exists && doc.data().plan) {
-      plan = doc.data().plan;
-    } else {
-      await ref.set({ plan: "free" }, { merge: true });
+  /* ================= AUTH ================= */
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.replace("/login.html");
+      return;
     }
 
-    applyPlanUI(uid, plan);
-  });
-}
-
-/* ================= APLICA UI ================= */
-function applyPlanUI(uid, plan) {
-  CURRENT_PLAN = plan;
-  LIMIT = limits[plan];
-
-  const monthKey = new Date().toISOString().slice(0, 7);
-  USAGE_KEY = `usage_${uid}_${monthKey}`;
-
-  USED = parseInt(localStorage.getItem(USAGE_KEY)) || 0;
-
-  userPlanEl.innerText =
-    `Plano ${plan.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
-
-  watermarkEl.style.display = plan === "free" ? "block" : "none";
-  const isFree = plan === "free";
-
-upgradeBox.style.display  = isFree ? "block" : "none";
-upgradeBtn.style.display  = isFree ? "inline-block" : "none";
-
-  const manageBtn = document.getElementById("managePlanBtn");
-
-if (plan === "free") {
-  manageBtn.style.display = "none";
-} else {
-  manageBtn.style.display = "inline-block";
-}
-manageBtn.onclick = async () => {
-  const res = await fetch("/api/create-portal-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ uid: CURRENT_UID })
+    UID = user.uid;
+    subscribeUserDoc();
   });
 
-  const data = await res.json();
-  if (data.url) {
-    window.location.href = data.url;
+  /* ================= FIRESTORE REALTIME ================= */
+  function subscribeUserDoc() {
+    db.collection("users").doc(UID).onSnapshot(doc => {
+      const data = doc.exists ? doc.data() : { plan: "free" };
+      applyPlan(data.plan || "free");
+    });
   }
-};
 
-  updateGenerateButton();
-}
+  /* ================= APLICA PLANO ================= */
+  function applyPlan(plan) {
+    PLAN = plan;
+    LIMIT = limits[PLAN];
 
-/* ================= GERAR ================= */
-generateBtn.onclick = () => {
-  if (USED >= LIMIT) return;
+    const monthKey = new Date().toISOString().slice(0, 7);
+    USAGE_KEY = `usage_${UID}_${monthKey}`;
+    USED = parseInt(localStorage.getItem(USAGE_KEY)) || 0;
 
-  USED++;
-  localStorage.setItem(USAGE_KEY, USED);
+    userPlanEl.innerText =
+      `Plano ${PLAN.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
 
-  document.getElementById("ideaText").innerText = "Ideia gerada com IA";
-  document.getElementById("copyText").innerText = "Legenda persuasiva";
-  document.getElementById("imagePreview").src =
-    "https://via.placeholder.com/600";
+    const isFree = PLAN === "free";
 
-  resultBox.style.display = "block";
+    watermarkEl.style.display = isFree ? "block" : "none";
+    upgradeBox.style.display  = isFree ? "block" : "none";
+    upgradeBtn.style.display  = isFree ? "inline-block" : "none";
+    manageBtn.style.display   = isFree ? "none" : "inline-block";
 
-  userPlanEl.innerText =
-    `Plano ${CURRENT_PLAN.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
-
-  updateGenerateButton();
-};
-
-/* ================= BOTÃO ================= */
-function updateGenerateButton() {
-  if (USED >= LIMIT) {
-    generateBtn.disabled = true;
-    generateBtn.innerText = "Limite atingido";
-  } else {
-    generateBtn.disabled = false;
-    generateBtn.innerText = "Gerar conteúdo";
+    updateGenerateButton();
   }
-}
 
-/* ================= BOTÕES AUX ================= */
-document.getElementById("logoutBtn").onclick = async () => {
-  await auth.signOut();
-  window.location.replace("/login.html");
-};
+  /* ================= GERAR ================= */
+  generateBtn.addEventListener("click", () => {
+    if (USED >= LIMIT) return;
 
-document.getElementById("upgradeBtn").onclick = () => {
-  window.location.href = "/planos.html";
-};
+    USED++;
+    localStorage.setItem(USAGE_KEY, USED);
+
+    document.getElementById("ideaText").innerText = "Ideia gerada com IA";
+    document.getElementById("copyText").innerText = "Legenda persuasiva";
+    document.getElementById("imagePreview").src =
+      "https://via.placeholder.com/600";
+
+    resultBox.style.display = "block";
+
+    userPlanEl.innerText =
+      `Plano ${PLAN.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
+
+    updateGenerateButton();
+  });
+
+  function updateGenerateButton() {
+    if (USED >= LIMIT) {
+      generateBtn.disabled = true;
+      generateBtn.innerText = "Limite atingido";
+    } else {
+      generateBtn.disabled = false;
+      generateBtn.innerText = "Gerar conteúdo";
+    }
+  }
+
+  /* ================= BOTÕES ================= */
+  document.getElementById("logoutBtn").onclick = async () => {
+    await auth.signOut();
+    window.location.replace("/login.html");
+  };
+
+  upgradeBtn.onclick = () => {
+    window.location.href = "/planos.html";
+  };
+
+  manageBtn.onclick = async () => {
+    const res = await fetch("/api/create-portal-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: UID })
+    });
+
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  };
+
+});
 </script>
-
 </body>
 </html>
