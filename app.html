@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>App — Lyvra</title>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -11,9 +12,24 @@
 <body>
 
 <h1>Bem-vindo ao Lyvra</h1>
+
 <p id="user-plan">Carregando...</p>
-<div class="upgrade" id="upgradeBox" style="display:none;">
+
+<button id="generateBtn">Gerar conteúdo</button>
+<button id="upgradeBtn">Upgrade</button>
 <button id="logoutBtn">Sair</button>
+
+<div id="result" style="display:none;">
+  <p><strong>Ideia:</strong> <span id="ideaText"></span></p>
+  <p><strong>Legenda:</strong> <span id="copyText"></span></p>
+  <img id="imagePreview" width="300">
+  <div id="watermark" style="display:none;">Criado com Lyvra AI</div>
+</div>
+
+<div class="upgrade" id="upgradeBox" style="display:none;">
+  Você está no plano Free. Faça upgrade para liberar mais recursos.
+</div>
+
 <script>
 /* ================= FIREBASE ================= */
 firebase.initializeApp({
@@ -39,7 +55,7 @@ const upgradeBox  = document.getElementById("upgradeBox");
 const generateBtn = document.getElementById("generateBtn");
 const resultBox   = document.getElementById("result");
 
-/* ================= ESTADO GLOBAL ================= */
+/* ================= ESTADO ================= */
 let CURRENT_PLAN = "free";
 let CURRENT_UID  = null;
 let USED         = 0;
@@ -57,7 +73,7 @@ auth.onAuthStateChanged((user) => {
   listenUserPlan(CURRENT_UID);
 });
 
-/* ================= ESCUTA PLANO EM TEMPO REAL ================= */
+/* ================= ESCUTA PLANO (REALTIME) ================= */
 function listenUserPlan(uid) {
   const ref = db.collection("users").doc(uid);
 
@@ -84,22 +100,17 @@ function applyPlanUI(uid, plan) {
 
   USED = parseInt(localStorage.getItem(USAGE_KEY)) || 0;
 
-  // Header
   userPlanEl.innerText =
     `Plano ${plan.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
 
-  // Watermark e Upgrade
   watermarkEl.style.display = plan === "free" ? "block" : "none";
-  if (plan === "free") {
-  upgradeBox.style.display = "block";
-} else {
-  upgradeBox.style.display = "none";
-}
+  upgradeBox.style.display  = plan === "free" ? "block" : "none";
+
   updateGenerateButton();
 }
 
-/* ================= BOTÃO GERAR ================= */
-generateBtn.addEventListener("click", () => {
+/* ================= GERAR ================= */
+generateBtn.onclick = () => {
   if (USED >= LIMIT) return;
 
   USED++;
@@ -116,9 +127,9 @@ generateBtn.addEventListener("click", () => {
     `Plano ${CURRENT_PLAN.toUpperCase()} • ${USED}/${LIMIT === Infinity ? "∞" : LIMIT}`;
 
   updateGenerateButton();
-});
+};
 
-/* ================= CONTROLE DO BOTÃO ================= */
+/* ================= BOTÃO ================= */
 function updateGenerateButton() {
   if (USED >= LIMIT) {
     generateBtn.disabled = true;
@@ -129,7 +140,7 @@ function updateGenerateButton() {
   }
 }
 
-/* ================= BOTÕES ================= */
+/* ================= BOTÕES AUX ================= */
 document.getElementById("logoutBtn").onclick = async () => {
   await auth.signOut();
   window.location.replace("/login.html");
@@ -139,5 +150,6 @@ document.getElementById("upgradeBtn").onclick = () => {
   window.location.href = "/planos.html";
 };
 </script>
+
 </body>
 </html>
